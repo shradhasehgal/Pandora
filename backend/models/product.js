@@ -4,8 +4,8 @@ let Product = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        minlength: 3,
     },
+    
     price: {
         type: Number,
         required: true
@@ -22,6 +22,11 @@ let Product = new mongoose.Schema({
     vendor: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
+    },
+
+    dispatch: {
+        type: Boolean,
+        default: false,
     },
 
 });
