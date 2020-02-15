@@ -5,7 +5,8 @@ const mongoose = require('mongoose')
 
 const app = express();
 const PORT = 4000;
-const userRoutes = express.Router();
+// const userRoutes = express.Router();
+const router = express();
 
 let User = require('./models/user');
 
@@ -21,8 +22,56 @@ connection.once('open', function() {
 
 // API endpoints
 
+router.post('/user/add', (req, res) => {
+    bcrypt.hash(req.body.password, 10, (err, hash) => {
+        if (err) res.status(400).send(err);
+        new models.User({
+            ...req.body,
+            password: hash,
+            user_type: req.body.user_type || 'C',
+        }).save((err, response) => {
+            if (err) res.status(400).send(err);
+            else res.status(201).send(response);
+        });
+    });
+});
+
+router.post('/user/login', (req, res) => {
+    let find = req.body.username || req.body.email;
+    models.User.findOne({
+        username: find
+    })
+        .then(user => {
+            if(!user) res.status(400).send({"message": "User not found"});
+            else {
+                bcrypt.compare(req.body.password, user.password, (err, result) => {
+                    if (result){
+                        models.Token.findOne({
+                            user,
+                        })
+                            .then(token => {
+                                if(!token) {
+                                    token = new models.Token({user: user});
+                                    token.save();
+                                }
+                                else if(Date.now() > token.expire)
+                                {
+                                    token.delete();
+                                    token = new models.Token({user: user});
+                                    token.save();
+                                }
+                                res.status(200).send({token: token.token});
+                            })
+                    }
+                    else res.status(400).send({"message": "password is wrong."});
+                });
+            }
+        })
+        .catch(err => console.log(err));
+});
+
 // Getting all the users
-userRoutes.route('/').get(function(req, res) {
+router.route('/').get(function(req, res) {
     User.find(function(err, users) {
         if (err) {
             console.log(err);
@@ -57,3 +106,4 @@ app.use('/', userRoutes);
 app.listen(PORT, function() {
     console.log("Server is running on port: " + PORT);
 });
+
