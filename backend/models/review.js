@@ -7,7 +7,7 @@ let Review = new mongoose.Schema({
         ref: 'User'
     },
     
-    feedback: {
+    review: {
         type: String,
     },
     
@@ -16,8 +16,10 @@ let Review = new mongoose.Schema({
         enum: [1, 2, 3, 4, 5]
     },
     
-    customer
-
+    customer:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }
 
 });
 
