@@ -273,7 +273,7 @@ router.route('/products/delete').delete((req, res)=> {
     });
 });
 
-router.get('/products/search', (req, res) => {
+router.post('/products/search', (req, res) => {
 
     Product.find({name: req.body.name, quantity: {$gt: 0}})
         .then(products => res.json(products))
