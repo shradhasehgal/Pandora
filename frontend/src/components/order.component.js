@@ -9,10 +9,12 @@ export default class OrdersList extends Component {
     }
 
     componentDidMount() {
-        token = localStorage.getItem('token');
-        axios.post('http://localhost:4000/orders/view', { headers: { Authorization: token } })
+        // token = localStorage.getItem('token');
+        // axios.post('http://localhost:4000/orders', { headers: { Authorization: token } })
+        axios.get('http://localhost:4000/api/orders')
 
              .then(response => {
+                 console.log(response.data)
                  this.setState({orders: response.data});
              })
              .catch(function(error) {

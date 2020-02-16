@@ -7,7 +7,10 @@ import Register from "./components/register.component";
 import Login from "./components/login.component";
 import Search from "./components/search.component";
 import Product from "./components/product.component";
+import Vendor from "./components/vendor-product.component";
 import Orders from "./components/order.component";
+import Front from "./components/front.component";
+
 
 
 function App() {
@@ -17,13 +20,12 @@ function App() {
       <Navbar />
       <br/>
       
-      <Link to="/register" className="nav-link">Register</Link>
-      <Link to="/login" className="nav-link">Login</Link>
-      <br></br>
+      <Route path="/" component={Front} />
       <Route path="/register" component={Register} />
       <Route path="/login" exact component={Login} />
       <Route path="/search" exact component={Search} />
       <Route path="/products" exact component={Product} />
+      <Route path="/vendor" exact component={Vendor} />
       <Route path="/orders" exact component={Orders} />
       </div>
 

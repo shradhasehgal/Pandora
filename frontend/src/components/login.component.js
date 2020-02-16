@@ -32,9 +32,9 @@ export default class Login extends Component {
         }
 
         console.log(User)
-        window.localStorage.setItem('token', res.data.token);
         axios.post('http://localhost:4000/api/users/login', User)
              .then(res => {
+                window.localStorage.setItem('token', res.data.token);
                     // console.log(window.localStorage.getItem('token'));
                     console.log(res.data)
                 })

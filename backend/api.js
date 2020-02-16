@@ -416,12 +416,30 @@ router.post('/orders/edit', (req, res) => {
 });
 
 router.route('/orders').get((req, res) => {
+
     Order.find()
-      .then(orders => {
-        //   console.log(orders)
-          res.json(orders)
-        })
-      .catch(err => res.status(400).json(err));
+    .populate({
+        path: 'product',
+        populate: {
+            path: 'vendor'
+        }
+    })
+    .exec((err, orders) => {
+        if(err) res.status(400).json(err);
+        else 
+        {
+            orders.forEach(order => {
+                order.product.vendor.password = undefined;
+            })
+            res.status(200).json(orders);
+        }
+    })
+    // Order.find()
+    //   .then(orders => {
+    //     //   console.log(orders)
+    //       res.json(orders)
+    //     })
+    //   .catch(err => res.status(400).json(err));
 });
 
 
