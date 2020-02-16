@@ -7,16 +7,16 @@ export default class Login extends Component {
         super(props);
 
         this.state = {
-            email: '',
+            username: '',
             password:'',
         }
-        this.onChangeEmail = this.onChangeEmail.bind(this);
+        this.onChangeUsername = this.onChangeUsername.bind(this);
         this.onChangePassword = this.onChangePassword.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
     }
     
-    onChangeEmail(event) {
-        this.setState({ email: event.target.value });
+    onChangeUsername(event) {
+        this.setState({ username: event.target.value });
     }
 
     onChangePassword(event) {
@@ -27,14 +27,17 @@ export default class Login extends Component {
         e.preventDefault();
 
         const User = {
-            email: this.state.email,
+            username: this.state.username,
             password:  this.state.password,
         }
 
         console.log(User)
-
+        window.localStorage.setItem('token', res.data.token);
         axios.post('http://localhost:4000/api/users/login', User)
-             .then(res => console.log(res.data))
+             .then(res => {
+                    // console.log(window.localStorage.getItem('token'));
+                    console.log(res.data)
+                })
              .catch(err => console.log(err));
 
         this.setState({
@@ -48,11 +51,11 @@ export default class Login extends Component {
             <div>
                 <form onSubmit={this.onSubmit}>
                     <div className="form-group">
-                        <label>Email: </label>
+                        <label>Username: </label>
                         <input type="text" 
                                className="form-control" 
-                               value={this.state.email}
-                               onChange={this.onChangeEmail}
+                               value={this.state.username}
+                               onChange={this.onChangeUsername}
                                />  
                     </div>
                     <div className="form-group">

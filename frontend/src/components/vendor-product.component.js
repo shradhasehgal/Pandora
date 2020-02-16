@@ -7,18 +7,18 @@ export default class CreateUser extends Component {
         super(props);
 
         this.state = {
-            username: '',
-            password:'',
-            type: ''
+            name: '',
+            quantity:'',
+            price: ''
         }
-        this.onChangePassword = this.onChangePassword.bind(this);
-        this.onChangeUsername = this.onChangeUsername.bind(this);
-        this.onChangeType = this.onChangeType.bind(this);
+        this.onChangeName = this.onChangeName.bind(this);
+        this.onChangeQuantity = this.onChangeQuantity.bind(this);
+        this.onChangePrice = this.onChangePrice.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
     }
     
-    onChangeUsername(event) {
-        this.setState({ username: event.target.value });
+    onChangeName(event) {
+        this.setState({ name: event.target.value });
     }
 
     onChangeType(event) {
@@ -32,7 +32,7 @@ export default class CreateUser extends Component {
     onSubmit(e) {
         e.preventDefault();
 
-        const newUser = {
+        const newProduct = {
             username: this.state.username,
             type: this.state.type,
             password:  this.state.password,
