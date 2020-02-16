@@ -313,7 +313,7 @@ router.route('/products/delete').delete((req, res)=> {
 
 router.get('/products/search', (req, res) => {
 
-    Product.find({name: req.body.name})
+    Product.find({name: req.body.name, quantity: {$gt: 0}})
         .then(products => res.json(products))
         .catch(err => {res.status(400).send(err); });
 
@@ -346,5 +346,125 @@ router.route('/tokens').get((req, res) => {
 });
 
 // Orders
+
+router.post('/orders/place', (req, res) => {
+
+    Authorize(req)
+    .then(user =>{
+        if(!user) return res.status(400).json({'message': 'User not found'});
+        User.findOne({_id: user})
+            .then(user => {
+                if(!user) return res.status(400).json({'message': 'User not found'});
+                if(user.type != "C") 
+                    return res.status(401).json({'message': 'User not authorized to place orders'});
+                
+                Product.findOne({ _id: req.body.product })
+                .then(product => {
+                    if(!product) return res.status(400).json({'message': 'Product not found'});
+                    if(product.quantity < req.body.quantity) return res.status(400).json({'message': 'Order cannot be placed, quantity exceeded'});
+    
+                    product.quantity -= req.body.quantity;
+                    product.save();
+    
+                    let order = new Order(req.body);
+                    order.customer = user;
+                    if(product.quantity == 0)
+                        order.status = "Placed";
+                    order.save();
+                    res.status(200).json(order);
+                })
+                .catch(err => {
+                    res.status(400).send(err);
+                });
+            })
+            .catch(err => {
+                res.status(400).send(err);
+            });
+    })
+    .catch(err => {
+        res.status(400).send(err);
+    });    
+});
+
+
+router.get('/orders/view', (req, res) => {
+
+    Authorize(req)
+    .then(user =>{
+        if(!user) return res.status(400).json({'message': 'User not found'});
+        User.findOne({_id: user})
+            .then(user => {
+                if(!user) return res.status(400).json({'message': 'User not found'});
+                if(user.type != "C") 
+                    return res.status(401).json({'message': 'Vendor type: user does not have any orders'});
+                
+                // console.log("wheee")
+                Order.find({customer: user})
+                .then(orders => {res.json(orders)})
+                .catch(err => res.status(400).json(err));
+            })
+            .catch(err => {
+                res.status(400).send(err);
+            });
+     })
+    .catch(err => {
+        res.status(400).send(err);
+    });    
+});
+
+router.post('/orders/edit', (req, res) => {
+
+    Authorize(req)
+    .then(user =>{
+        if(!user) return res.status(400).json({'message': 'User not found'});
+        User.findOne({_id: user})
+            .then(user => {
+                if(!user) return res.status(400).json({'message': 'User not found'});
+                // if(user.type != "C") 
+                //     return res.status(401).json({'message': 'Vendor type: user does not have any orders'});
+                
+                // console.log("wheee")
+                Order.find({_id: req.body.id})
+                    .then( order => {
+                        if(!order) return res.status(400).json({'message': 'Order not found'});
+                        Product.findOne({ _id: order.product })
+                        .then(product => {
+                            if(!product)
+                            { 
+                                console.log(order.product)
+                                return res.status(400).json({'message': 'Product not found'});
+                            }
+                            if(product.quantity - order.quantity + req.body.quantity < 0) return res.status(400).json({'message': 'Order cannot be placed, quantity exceeded'});
+                            product.quantity  = product.quantity - order.quantity + req.body.quantity;
+                            product.save();
+                            order.quantity = req.body.quantity;
+                            order.save()
+                            res.status(200).json(order);
+                        })
+                        .catch(err => {
+                            res.status(400).send(err);
+                        });
+                        
+                    })
+                    .catch(err => res.status(400).json(err));
+                })
+                
+            .catch(err => {
+                res.status(400).send(err);
+            });
+     })
+    .catch(err => {
+        res.status(400).send(err);
+    });    
+});
+
+router.route('/orders').get((req, res) => {
+    Order.find()
+      .then(orders => {
+        //   console.log(orders)
+          res.json(orders)
+        })
+      .catch(err => res.status(400).json(err));
+});
 
 module.exports = router;

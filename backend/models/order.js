@@ -3,25 +3,24 @@ const mongoose = require('mongoose');
 let Order = new mongoose.Schema({
     product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'Product',
+        required: true
     },
     customer: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     },
     quantity: {
         type: Number,
-        required: true
+        required: true,
+        default: 1
     },
 
     status: {
         type: String,
-        enum: ['Waiting', 'Placed', 'Dispatched', 'Canceled']
-    },
-
-    vendor: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        enum: ['Waiting', 'Placed', 'Dispatched', 'Canceled'],
+        default: 'Waiting'
     },
 
 });
