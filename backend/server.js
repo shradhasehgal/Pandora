@@ -11,7 +11,7 @@ const PORT = 4000;
 const api = require('./api');
 let User = require('./models/user');
 let Token = require('./models/token');
-// let Review = require('./models/review');
+let Review = require('./models/review');
 let Order = require('./models/order');
 let Product = require('./models/product');
 
@@ -24,7 +24,7 @@ app.use('/api', api);
 
 const eraseDatabaseOnSync = false;
 
-mongoose.connect('mongodb://127.0.0.1:27017/dass', { useNewUrlParser: true })
+mongoose.connect('mongodb://127.0.0.1:27017/app', { useNewUrlParser: true })
 .then(async () => {
     if (eraseDatabaseOnSync) {
         await Promise.all([
