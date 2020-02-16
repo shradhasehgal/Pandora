@@ -14,11 +14,6 @@ let Product = new mongoose.Schema({
         type: Number,
         required: true
     },
-
-    price_per_unit: {
-        type: Number,
-    },
-
     vendor: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'

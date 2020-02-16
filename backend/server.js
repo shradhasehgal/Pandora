@@ -9,6 +9,11 @@ const PORT = 4000;
 // const router = express();
 
 const api = require('./api');
+let User = require('./models/user');
+let Token = require('./models/token');
+// let Review = require('./models/review');
+let Order = require('./models/order');
+let Product = require('./models/product');
 
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -16,96 +21,27 @@ app.use(bodyParser.json());
 
 app.use('/api', api);
 // Connection to mongodb
-mongoose.connect('mongodb://127.0.0.1:27017/users', { useNewUrlParser: true });
+
+const eraseDatabaseOnSync = true;
+
+mongoose.connect('mongodb://127.0.0.1:27017/users', { useNewUrlParser: true })
+.then(async () => {
+    if (eraseDatabaseOnSync) {
+        await Promise.all([
+            User.deleteMany({}),
+            Token.deleteMany({}),
+            Order.deleteMany({}),
+            // Review.deleteMany({}),
+            Product.deleteMany({}),
+        ]);
+    }
+    app.listen(PORT, () =>
+        console.log(`Example app listening on port ${PORT}!`),
+    );
+});;
+
+
 const connection = mongoose.connection;
 connection.once('open', function() {
     console.log("MongoDB database connection established succesfully.");
 })
-
-// // API endpoints
-
-// router.post('/user/add', (req, res) => {
-//     bcrypt.hash(req.body.password, 10, (err, hash) => {
-//         if (err) res.status(400).send(err);
-//         new models.User({
-//             ...req.body,
-//             password: hash,
-//             user_type: req.body.user_type || 'C',
-//         }).save((err, response) => {
-//             if (err) res.status(400).send(err);
-//             else res.status(201).send(response);
-//         });
-//     });
-// });
-
-// router.post('/user/login', (req, res) => {
-//     let find = req.body.username || req.body.email;
-//     models.User.findOne({
-//         username: find
-//     })
-//         .then(user => {
-//             if(!user) res.status(400).send({"message": "User not found"});
-//             else {
-//                 bcrypt.compare(req.body.password, user.password, (err, result) => {
-//                     if (result){
-//                         models.Token.findOne({
-//                             user,
-//                         })
-//                             .then(token => {
-//                                 if(!token) {
-//                                     token = new models.Token({user: user});
-//                                     token.save();
-//                                 }
-//                                 else if(Date.now() > token.expire)
-//                                 {
-//                                     token.delete();
-//                                     token = new models.Token({user: user});
-//                                     token.save();
-//                                 }
-//                                 res.status(200).send({token: token.token});
-//                             })
-//                     }
-//                     else res.status(400).send({"message": "password is wrong."});
-//                 });
-//             }
-//         })
-//         .catch(err => console.log(err));
-// });
-
-// // Getting all the users
-// router.route('/').get(function(req, res) {
-//     User.find(function(err, users) {
-//         if (err) {
-//             console.log(err);
-//         } else {
-//             res.json(users);
-//         }
-//     });
-// });
-
-// Adding a new user
-// userRoutes.route('/add').post(function(req, res) {
-//     let user = new User(req.body);
-//     user.save()
-//         .then(user => {
-//             res.status(200).json({'User': 'User added successfully'});
-//         })
-//         .catch(err => {
-//             res.status(400).send('Error');
-//         });
-// });
-
-// // Getting a user by id
-// userRoutes.route('/:id').get(function(req, res) {
-//     let id = req.params.id;
-//     User.findById(id, function(err, user) {
-//         res.json(user);
-//     });
-// });
-
-// app.use('/', userRoutes);
-
-app.listen(PORT, function() {
-    console.log("Server is running on port: " + PORT);
-});
-
