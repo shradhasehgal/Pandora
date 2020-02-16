@@ -15,8 +15,7 @@ let Token = new mongoose.Schema({
     },
     expire: {
         type: Date,
-        default: () => Date.now() + 7200,
-        required: true,
+        default: () => Date.now() + 3600*1000,
     },
 });
 

@@ -22,13 +22,13 @@ app.use(bodyParser.json());
 app.use('/api', api);
 // Connection to mongodb
 
-const eraseDatabaseOnSync = true;
+const eraseDatabaseOnSync = false;
 
-mongoose.connect('mongodb://127.0.0.1:27017/users', { useNewUrlParser: true })
+mongoose.connect('mongodb://127.0.0.1:27017/dass', { useNewUrlParser: true })
 .then(async () => {
     if (eraseDatabaseOnSync) {
         await Promise.all([
-            User.deleteMany({}),
+            User.deleteMany({}), User.remove({}),
             Token.deleteMany({}),
             Order.deleteMany({}),
             // Review.deleteMany({}),
