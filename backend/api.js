@@ -20,7 +20,7 @@ function Authorize(req)
     const token = req.header('Authorization');
     return Token.findOne({ token: token })
         .then(token => {
-            if(!token) {console.log("what rey"); return null;}
+            if(!token) {return null;}
             if(Date.now() > token.expire) {
                 let user = token.user;
                 token.delete();
