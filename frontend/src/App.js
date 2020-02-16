@@ -7,6 +7,8 @@ import Register from "./components/register.component";
 import Login from "./components/login.component";
 import Search from "./components/search.component";
 import Product from "./components/product.component";
+import Orders from "./components/order.component";
+
 
 function App() {
   return (
@@ -22,6 +24,7 @@ function App() {
       <Route path="/login" exact component={Login} />
       <Route path="/search" exact component={Search} />
       <Route path="/products" exact component={Product} />
+      <Route path="/orders" exact component={Orders} />
       </div>
 
     </Router>

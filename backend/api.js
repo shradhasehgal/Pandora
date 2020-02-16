@@ -57,10 +57,10 @@ router.post('/users/add', (req, res) => {
 });
 
 router.post('/users/login', (req, res) => {
-    let email = req.body.email, password = req.body.password;
-    if(!email || !password) return res.status(400).send({'message': 'Please enter all fields'});
+    let username = req.body.username, password = req.body.password;
+    if(!username || !password) return res.status(400).send({'message': 'Please enter all fields'});
 
-    User.findOne({ email: email })
+    User.findOne({ username: username })
         .then(user => {
             if(user){
                 bcrypt.compare(req.body.password, user.password, (err, result) => {
@@ -342,18 +342,30 @@ router.get('/orders/view', (req, res) => {
                 if(user.type != "C") 
                     return res.status(401).json({'message': 'Vendor type: user does not have any orders'});
                 
-                // console.log("wheee")
+
                 Order.find({customer: user})
-                .then(orders => {res.json(orders)})
-                .catch(err => res.status(400).json(err));
+                .populate({
+                    path: 'product',
+                    populate: {
+                        path: 'vendor'
+                    }
+                })
+                .exec((err, orders) => {
+                    if(err) res.status(400).json(err);
+                    else 
+                    {
+                        orders.forEach(order => {
+                            order.product.vendor.password = undefined;
+                        })
+                        res.status(200).json(orders);
+                    }
+                })
             })
             .catch(err => {
                 res.status(400).send(err);
             });
      })
-    .catch(err => {
-        res.status(400).send(err);
-    });    
+    .catch(err => {res.status(400).send(err);});    
 });
 
 router.post('/orders/edit', (req, res) => {
