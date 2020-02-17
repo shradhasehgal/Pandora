@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-export default class CustomerNavbar extends Component {
+export default class VendorNavbar extends Component {
 
   render() {
     return (
@@ -10,10 +10,13 @@ export default class CustomerNavbar extends Component {
         <div className="collpase navbar-collapse">
         <ul className="navbar-nav mr-auto">
           <li className="navbar-item">
-          <Link to="/search" className="nav-link">Search</Link>
+          <Link to="/" className="nav-link">View products</Link>
           </li>
           <li className="navbar-item">
-          <Link to="/orders" className="nav-link">View orders</Link>
+          <Link to="/" className="nav-link">View reviews</Link>
+          </li>
+          <li className="navbar-item">
+          <Link to="/" className="nav-link" onClick={() => {localStorage.clear(); window.location.reload()}}>Logout</Link>
           </li>
         </ul>
         </div>

@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 
+
 export default class Login extends Component {
     
     constructor(props) {
@@ -33,15 +34,19 @@ export default class Login extends Component {
 
         console.log(User)
         axios.post('http://localhost:4000/api/users/login', User)
-             .then(res => {
-                window.localStorage.setItem('token', res.data.token);
-                    // console.log(window.localStorage.getItem('token'));
-                    console.log(res.data)
-                })
-             .catch(err => console.log(err));
+            .then(res => {
+                console.log(res.data);
+                localStorage.setItem('token', res.data.token.token);
+                localStorage.setItem('user_type', res.data.token.user.type);
+                localStorage.setItem('user_name', res.data.token.user.username);
+                localStorage.setItem('user_id', res.data.token.user._id);
+                this.props.history.push("/dashboard");
+                window.location.reload();
+            })
+            .catch(err => console.log(err));
 
         this.setState({
-            email: '',
+            username: '',
             password: '',
         });
     }
@@ -60,7 +65,7 @@ export default class Login extends Component {
                     </div>
                     <div className="form-group">
                         <label>Password: </label>
-                        <input type="text" 
+                        <input type="password" 
                                className="form-control" 
                                value={this.state.password}
                                onChange={this.onChangePassword}

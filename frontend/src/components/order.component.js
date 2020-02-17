@@ -9,10 +9,14 @@ export default class OrdersList extends Component {
     }
 
     componentDidMount() {
-        // token = localStorage.getItem('token');
-        // axios.post('http://localhost:4000/orders', { headers: { Authorization: token } })
-        axios.get('http://localhost:4000/api/orders')
+        let token = localStorage.getItem('token');
+        console.log(token);
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          }    
 
+        axios.get('http://localhost:4000/api/orders/view' ,{ headers: headers} )
              .then(response => {
                  console.log(response.data)
                  this.setState({orders: response.data});
@@ -38,7 +42,7 @@ export default class OrdersList extends Component {
                     { 
                         this.state.orders.map((Order, i) => {
                             return (
-                                <tr>
+                                <tr key={i}>
                                     <td>{Order.product.name}</td>
                                     <td>{Order.quantity} </td>
                                     <td>{Order.status} </td>

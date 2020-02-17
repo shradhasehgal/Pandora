@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import axios from 'axios';
-
 export default class CreateUser extends Component {
     
     constructor(props) {
@@ -37,9 +36,10 @@ export default class CreateUser extends Component {
             type: this.state.type,
             password:  this.state.password,
         }
-
+        console.log(newUser);
         axios.post('http://localhost:4000/api/users/add', newUser)
-             .then(res => console.log(res.data));
+             .then(res => console.log(res.data))
+             .catch(err => console.log(err));
 
         this.setState({
             username: '',
@@ -71,12 +71,13 @@ export default class CreateUser extends Component {
                     </div>
                     <div className="form-group">
                         <label>Password: </label>
-                        <input type="text" 
+                        <input type="password" 
                                className="form-control" 
                                value={this.state.password}
                                onChange={this.onChangePassword}
                                />  
-                    </div>
+                    </div>     
+
                     <div className="form-group">
                         <input type="submit" value="Create User" className="btn btn-primary"/>
                     </div>
