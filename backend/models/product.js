@@ -33,7 +33,7 @@ let Product = new mongoose.Schema({
     reviews:
     [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product'
+        ref: 'Review'
     }],
 
     isDeleted: {

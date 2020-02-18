@@ -64,9 +64,10 @@ export default class Search extends Component {
     
         this.setState({
           quantity:''
+    
         })
 
-        // window.location.reload();
+        window.location.reload();
     }
 
     render() {
@@ -94,6 +95,7 @@ export default class Search extends Component {
                             <th>Price</th>
                             <th>Quantity left</th>
                             <th>Vendor</th>
+                            <th>Rating</th>
                             <th>Quantity</th>
                             <th></th>
                         </tr>
@@ -101,15 +103,20 @@ export default class Search extends Component {
                     <tbody>
                     {
                         this.state.products.map((Product, i) => {
-                            let left = 0;
+                            console.log(Product.vendor);
+                            let left = 0, rating =0;
                             if(Product.quantity > Product.no_orders) left = Product.quantity - Product.no_orders; 
                             else left = 0;
+                            rating = Product.vendor.rating;
+                    
+                            //rating = product
                             return (
                                 <tr key={i}>
                                     <td>{Product.name}</td>
                                     <td>{Product.price} </td>
                                     <td>{left}</td>
                                     <td>{Product.vendor.username} </td>
+                                    <td>{rating}</td>
                                     {/* <form onSubmit={this.onOrder}> */}
                                     <td><input type="number" value={this.state.quantity} onChange={this.onChangeQuantity}/> </td>
                                     <td><button onClick={() => {this.placeOrder(Product._id) }}>Buy</button></td>

@@ -19,10 +19,15 @@ let User = new mongoose.Schema({
         required: true,
     },
 
-    reviews: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Review'
-    }]
+    no_reviews: {
+        type: Number,
+        default: 0
+    }, 
+   
+    rating: {
+        type: Number
+
+    }
 
 });
 

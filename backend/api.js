@@ -307,12 +307,16 @@ router.post('/products/search', (req, res) => {
     Product.find({name: req.body.name, dispatch: false, isDeleted: false})
         .populate({
             path: 'vendor',
+            
         })
         .then(products => {
             products.forEach(product => {
                 product.vendor.password = undefined;
+                console.log(product.vendor);
             })
-            res.json(products)})
+            res.json(products);
+            console.log(products);
+        })
         .catch(err => {res.status(400).send(err); });
 
 });
@@ -602,6 +606,7 @@ router.post('/products/review', (req, res) => {
                             let review = new Review({review: req.body.review, rating: req.body.rating});
                             review.save(); 
                             product.reviews.push(review);
+                            console.log(product.reviews)
                             product.save();
                             res.status(200).json(review);
                         })
@@ -623,8 +628,7 @@ router.post('/products/review', (req, res) => {
 });
 
 router.post('/vendors/reviews', (req, res) => {
-    // console.log("Eee");
-    console.log(req.body);
++    console.log(req.body);
     Authorize(req)
     .then(user =>{
         if(!user) return res.status(400).json({'message': 'User not found'});
@@ -634,15 +638,17 @@ router.post('/vendors/reviews', (req, res) => {
                 // console.log("Eee2");
                 User.findOne({ _id: req.body.id })
                     .then(vendor => {
-                        console.log("EEEE");
                         if(!vendor) return res.status(400).json({'message': 'Product not found'});
-                        let review = new Review({rating: parseInt(req.body.rating)});
-                        console.log(review);
-                        review.save();
-                        vendor.reviews.push(review); 
+                        // let review = new Review({rating: parseInt(req.body.rating)});
+                        console.log(vendor.no_reviews);
+                        let rating = parseInt(req.body.rating);
+                        if(vendor.no_reviews == 0) vendor.rating = rating;
+                        else vendor.rating = (vendor.rating*vendor.no_reviews + rating)/(vendor.no_reviews+1);
+                        vendor.no_reviews = vendor.no_reviews + 1;
+                        console.log(vendor.rating);
                         vendor.save();
-                        console.log(vendor);
-                        res.status(200).json(review);
+                        console.log(vendor.rating);
+                        res.status(200).json(vendor);
                 })
             })
             .catch(err => {
@@ -655,33 +661,44 @@ router.post('/vendors/reviews', (req, res) => {
     });    
 });
 
-router.get('/vendors/review', (req, res) => {
-    
-    Product.find({vendor: req.body.id}) // All orders
-    .then( products => {
-        products.forEach(product => {
-            let reviews = product.reviews;
-            reviews.forEach({vendor: req.body.id}) // All orders
-            .then( products => {
-                products.forEach(product => {
-                    product.review.review = ;
-            })
-        })
-        res.status(200).json(products)
-    })
-    .catch(err => {
-        res.status(400).send(err);
-    });
-        
-});
-
-
 // router.get('/vendors/review', (req, res) => {
     
-//     User.findOne({ _id: req.body.id})
-//         .then(vendor => res.status(200).json(vendor))
-//         .catch(err => res.status(400).send(err));
+//     Product.find({vendor: req.body.id}) // All orders
+//     .then( products => {
+//         products.forEach(product => {
+//             let reviews = product.reviews;
+//             reviews.forEach({vendor: req.body.id}) // All orders
+//             .then( products => {
+//                 products.forEach(product => {
+//                     product.review.review = ;
+//             })
+//         })
+//         res.status(200).json(products)
+//     })
+//     .catch(err => {
+//         res.status(400).send(err);
+//     });
         
 // });
+
+
+router.get('/pro', (req, res) => {
+    
+    Product.find()
+    .populate({ path: 'reviews'})
+    .exec((err, products) => {
+        if(err) 
+        {
+            console.log("erro");
+            res.status(400).json(err);
+        }
+        else
+            res.status(200).json(products);
+        
+        
+    });
+
+
+});
 
 module.exports = router;
