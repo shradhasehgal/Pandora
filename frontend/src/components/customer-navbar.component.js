@@ -17,6 +17,12 @@ export default class CustomerNavbar extends Component {
           <Link to="/orders" className="nav-link">View orders</Link>
           </li>
           <li className="navbar-item">
+          <Link to="/product-review" className="nav-link">Review order</Link>
+          </li>
+          <li className="navbar-item">
+          <Link to="/vendor-review" className="nav-link">Rate Vendor</Link>
+          </li>
+          <li className="navbar-item">
           <Link className="nav-link" to="/" onClick={() => {
             localStorage.clear();
             window.location.href = "/"; }}>Logout</Link>

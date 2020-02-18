@@ -1,36 +1,31 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 
-export default class OrdersList extends Component {
+export default class Reviews extends Component {
     
     constructor(props) {
         super(props);
-        this.state = {orders: []};
-        this.onChangeQuantity = this.onChangeQuantity.bind(this);
-
-    }
-
-    onChangeQuantity(event) {
-        this.setState({ quantity: event.target.value });
+        this.state = {reviews: []}
     }
 
     componentDidMount() {
         let token = localStorage.getItem('token');
-        console.log(token);
+        let id = localStorage.getItem('user_id');
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': token
           }    
 
-        axios.get('http://localhost:4000/api/orders/view' ,{ headers: headers} )
+        axios.get('http://localhost:4000/api/vendors/view',{'id': id}, { headers: headers} )
              .then(response => {
                 console.log(response.data)
-                this.setState({orders: response.data});
+                this.setState({reviews: response.data});
              })
              .catch(function(error) {
                  console.log(error);
              })
     }
+
 
     render() {
         return (
@@ -39,22 +34,22 @@ export default class OrdersList extends Component {
                     <thead>
                         <tr>
                             <th>Product</th>
-                            <th>Quantity</th>
-                            <th>Status</th>
-                            <th>Vendor</th>
+                            <th>Quantity left</th>
+                            <th>Remove</th>
                         </tr>
                     </thead>
                     <tbody>
                     { 
-                        this.state.orders.map((Order, i) => {
+                        this.state.listings.map((product, i) => {
+                            let left = 0;
+                            if(product.quantity > product.no_orders) left = product.quantity - product.no_orders; 
+                            else left = 0;
                             return (
-                                <tr key={i}>
-                                    <td>{Order.product.name}</td>
-                                    <td>{Order.quantity} </td>
-                                    <td>{Order.status} </td>
-                                    <td>{Order.product.vendor.username} </td>
+                                <tr key={i} deleteProduct = {this.deleteProduct}>
+                                    <td>{product.name}</td>
+                                    <td>{left} </td>
+                                    <td> <a href="#" onClick={() => {this.deleteProduct(product._id) }}>delete</a></td>
                                 </tr>
-
                             )
                         })
                     }

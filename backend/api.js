@@ -159,7 +159,7 @@ router.post('/products/view', (req, res) => {
                 
             if(req.body.type == 1)
             {
-                Product.find({vendor: user, dispatch: false, isDeleted: false, $where: "this.quantity > this.no_orders"})
+                Product.find({vendor: user, dispatch: false, isDeleted: false, $where: "this.quantity > this.no_orders"}) // All orders
                 .then( products => {
                     products.forEach(product => {
                         product.vendor = undefined;
@@ -173,7 +173,7 @@ router.post('/products/view', (req, res) => {
 
             else if(req.body.type == 2)
             {
-                Product.find({vendor: user, dispatch: true, isDeleted: false})
+                Product.find({vendor: user, dispatch: true, isDeleted: false})  
                 .then( products => {
                     products.forEach(product => {
                         product.vendor = undefined;
@@ -385,13 +385,7 @@ router.get('/orders/view', (req, res) => {
     Authorize(req)
     .then(user =>{
         if(!user) 
-        {
-            console.log("Error! ");
-            console.log(req);
-            console.log(req.headers);
-            console.log(req.header('Authorization'));
             return res.status(400).json({'message': 'User not found'});
-        }
         User.findOne({_id: user})
             .then(user => {
                 if(!user) 
@@ -421,6 +415,82 @@ router.get('/orders/view', (req, res) => {
                         res.status(200).json(orders);
                     }
                 })
+            })
+            .catch(err => {
+                console.log("Error! ");
+                res.status(400).send(err);
+            });
+     })
+    .catch(err => {res.status(400).send(err);});    
+});
+
+
+
+router.post('/orders/type-view', (req, res) => {
+
+    // .log("EEEe");
+    Authorize(req)
+    .then(user =>{
+        if(!user) 
+            return res.status(400).json({'message': 'User not found'});
+        User.findOne({_id: user})
+            .then(user => {
+                if(!user) 
+                    return res.status(400).json({'message': 'User not found'});
+                if(user.type != "C") 
+                return res.status(401).json({'message': 'Vendor type: user does not have any orders'});
+                
+
+                if(req.body.type == "1")
+                {
+                    Order.find({customer: user, status:"Placed"})
+                    .populate({
+                        path: 'product',
+                        populate: {
+                            path: 'vendor'
+                        }
+                    })
+                    .exec((err, orders) => {
+                        if(err) 
+                        {
+                            console.log("error");
+                            res.status(400).json(err);
+                        }
+                        else 
+                        {
+                            orders.forEach(order => {
+                                order.product.vendor.password = undefined;
+                            })
+                            res.status(200).json(orders);
+                        }
+                    })
+                }
+
+                else 
+                {
+                    Order.find({customer: user, status: "Dispatched"})
+                    .populate({
+                        path: 'product',
+                        populate: {
+                            path: 'vendor'
+                        }
+                    })
+                    .exec((err, orders) => {
+                        if(err) 
+                        {
+                            console.log("erro");
+                            res.status(400).json(err);
+                        }
+                        else 
+                        {
+                            orders.forEach(order => {
+                                order.product.vendor.password = undefined;
+                            })
+                            res.status(200).json(orders);
+                        }
+                    })
+                }
+   
             })
             .catch(err => {
                 console.log("Error! ");
@@ -508,7 +578,7 @@ router.route('/orders').get((req, res) => {
 
 // Reviews
 
-router.post('/products/reviews', (req, res) => {
+router.post('/products/review', (req, res) => {
 
     Authorize(req)
     .then(user =>{
@@ -553,61 +623,61 @@ router.post('/products/reviews', (req, res) => {
 });
 
 router.post('/vendors/reviews', (req, res) => {
-
+    // console.log("Eee");
+    console.log(req.body);
     Authorize(req)
     .then(user =>{
         if(!user) return res.status(400).json({'message': 'User not found'});
         User.findOne({_id: user})
             .then(user => {
                 if(!user) return res.status(400).json({'message': 'User not found'});
-                Order.findOne({ _id: req.body.id })
-                .then(order => {
-                    if(!order) return res.status(400).json({'message': 'Order not found'});
-                    if(!order.customer.equals(user._id))
-                    { 
-                        console.log(order.customer, user._id);                           
-                        return res.status(400).json({'message':'Order not placed by user, cannot review'});
-                    }
-                    if(order.status == "Waiting" || order.status == "Canceled") return res.status(400).json({'message':'Product not placed, cannot review'});
-    
-                    Product.findOne({ _id: order.product })
-                        .then(product => {
-                            if(!product) return res.status(400).json({'message': 'Product not found'});
-                            Vendor.findOne({ _id: product.vendor })
-                                .then(vendor => {
-                                    if(!vendor) return res.status(400).json({'message': 'Product not found'});
-                                    let review = new Review({rating: req.body.rating});
-                                    review.save();
-                                    vendor.reviews.push(review); 
-                                    res.status(200).json(review);
-                            })
-                        })
-                        .catch(err => {
-                            res.status(400).json(err);
-                        });
+                // console.log("Eee2");
+                User.findOne({ _id: req.body.id })
+                    .then(vendor => {
+                        console.log("EEEE");
+                        if(!vendor) return res.status(400).json({'message': 'Product not found'});
+                        let review = new Review({rating: parseInt(req.body.rating)});
+                        console.log(review);
+                        review.save();
+                        vendor.reviews.push(review); 
+                        res.status(200).json(review);
                 })
-                .catch(err => {
-                    res.status(400).send(err);
-                });
             })
             .catch(err => {
-                res.status(400).send(err);
+                res.status(400).json(err);
             });
+                
     })
     .catch(err => {
         res.status(400).send(err);
     });    
 });
 
-router.get('/vendors/view', (req, res) => {
+router.get('/vendors/review', (req, res) => {
+    
+    let lis = []
+    User.findOne({ _id: req.body.id})
+        .then(vendor => {
+            Product.find({vendor: vendor})
+            .then(products => 
+                {
+                    lis.append()
+                })
+            .catch(err => {
+               res.status(400).send(err);
+            })
+        .catch(err => { res.status(400).send(err);});
 
-    Review.find({vendor: req.body.id})
-        .then(reviews => { res.status(200).json(reviews) })
-        .catch(err => {
-            res.status(400).send(err);
-        });
-        
+    })
 });
 
+
+// router.get('/vendors/review', (req, res) => {
+    
+//     User.findOne({ _id: req.body.id})
+//         .then(vendor => res.status(200).json(vendor))
+//         .catch(err => res.status(400).send(err));
+        
+// });
 
 module.exports = router;
