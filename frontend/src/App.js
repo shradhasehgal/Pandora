@@ -60,7 +60,7 @@ class App extends React.Component {
           <Route path="/add-product" component={AddProduct} />
           <Route path="/orders" component={Orders} />
           <Route path="/dispatch" component={Dispatch} />
-          <Route path="/reviews" component={Reviews} />
+          <Route path="/vendor" component={Reviews} />
           <Route path="/product-review" component={ProductReview} />
           <Route path="/vendor-review" component={VendorReview} />
 

@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 // import CustomerNavbar from "./user-navbar.component"
+import { BrowserRouter as Router, Route, Link} from "react-router-dom";
+
 
 export default class Search extends Component {
     
@@ -115,7 +117,7 @@ export default class Search extends Component {
                                     <td>{Product.name}</td>
                                     <td>{Product.price} </td>
                                     <td>{left}</td>
-                                    <td>{Product.vendor.username} </td>
+                                    <td><Link to={{ pathname: '/vendor', state: { id: Product.vendor._id} }}>{Product.vendor.username} </Link></td>
                                     <td>{rating}</td>
                                     {/* <form onSubmit={this.onOrder}> */}
                                     <td><input type="number" value={this.state.quantity} onChange={this.onChangeQuantity}/> </td>

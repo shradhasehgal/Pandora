@@ -682,19 +682,18 @@ router.post('/vendors/reviews', (req, res) => {
 // });
 
 
-router.get('/pro', (req, res) => {
+router.post('/pro', (req, res) => {
     
-    Product.find()
+    Product.find({vendor: req.body.id, dispatch: true})
     .populate({ path: 'reviews'})
     .exec((err, products) => {
-        if(err) 
-        {
-            console.log("erro");
-            res.status(400).json(err);
-        }
-        else
-            res.status(200).json(products);
-        
+    if(err) 
+    {
+        console.log("erro");
+        res.status(400).json(err);
+    }
+    else
+        res.status(200).json(products);
         
     });
 
