@@ -47,28 +47,6 @@ export default class Search extends Component {
         });
     }
 
-    // onOrder(product){
-
-    //     const Order = {
-    //         product: product,
-    //         quantity: this.state.quantity
-    //     }
-
-    //     console.log(Order);
-
-    //     axios.post('http://localhost:4000/api/orders/place', Order)
-    //             .then(res => {
-    //             console.log(res.data);
-    //             // this.setState({products: res.data});
-
-    //         })
-    //             .catch(err => console.log(err));
-
-    //     this.setState({
-    //         quantity : ''
-    //     });
-        
-    // }
     placeOrder(id) {
         let token = localStorage.getItem('token');
         console.log(token);
@@ -87,6 +65,8 @@ export default class Search extends Component {
         this.setState({
           quantity:''
         })
+
+        // window.location.reload();
     }
 
     render() {
@@ -120,11 +100,14 @@ export default class Search extends Component {
                     <tbody>
                     { 
                         this.state.products.map((Product, i) => {
+                            let left = 0;
+                            if(Product.quantity > Product.no_orders) left = Product.quantity - Product.no_orders; 
+                            else left = 0;
                             return (
                                 <tr key={i}>
                                     <td>{Product.name}</td>
                                     <td>{Product.price} </td>
-                                    <td> {Product.quantity} </td>
+                                    <td>{left}</td>
                                     <td>{Product.vendor.username} </td>
                                     {/* <form onSubmit={this.onOrder}> */}
                                     <td><input type="number" value={this.state.quantity} onChange={this.onChangeQuantity}/> </td>

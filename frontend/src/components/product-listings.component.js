@@ -34,12 +34,7 @@ export default class Listings extends Component {
             'Content-Type': 'application/json',
             'Authorization': token
         }    
-        axios.delete('http://localhost:4000/api/products/delete/', {
-            headers: { 'Authorization':token },
-            data: {
-              'id': id
-            }
-          })
+        axios.post('http://localhost:4000/api/products/delete/',{'id': id}, {headers: headers})
           .then(response => { console.log(response.data)});
     
         this.setState({
@@ -63,10 +58,13 @@ export default class Listings extends Component {
                     <tbody>
                     { 
                         this.state.listings.map((product, i) => {
+                            let left = 0;
+                            if(product.quantity > product.no_orders) left = product.quantity - product.no_orders; 
+                            else left = 0;
                             return (
                                 <tr key={i} deleteProduct = {this.deleteProduct}>
                                     <td>{product.name}</td>
-                                    <td>{product.quantity} </td>
+                                    <td>{left} </td>
                                     <td> <a href="#" onClick={() => {this.deleteProduct(product._id) }}>delete</a></td>
                                 </tr>
                             )

@@ -63,11 +63,15 @@ export default class CreateUser extends Component {
                     
                     <div className="form-group">
                         <label>Type: </label>
-                        <input type="text" 
+                        <select className="form-control"  value={this.state.type} onChange={this.onChangeType}> 
+                            <option name="C" value="C">Customer</option>
+                            <option name="V" value="V">Vendor</option>
+                        </select>
+                        {/* <input type="text" 
                                className="form-control" 
                                value={this.state.type}
                                onChange={this.onChangeType}
-                               />  
+                               />   */}
                     </div>
                     <div className="form-group">
                         <label>Password: </label>

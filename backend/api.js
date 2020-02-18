@@ -23,13 +23,13 @@ function Authorize(req)
     return Token.findOne({ token: token })
         .then(token => {
             if(!token) {return null;}
-            if(Date.now() > token.expire) {
-                let user = token.user;
-                token.delete();
-                token = new Token({user});
-                token.save();
-            }
-            // console.log(token.user)
+            // if(Date.now() > token.expire) {
+            //     let user = token.user;
+            //     token.delete();
+            //     token = new Token({user});
+            //     token.save();
+            // }
+            // // console.log(token.user)
             return token.user;
         })
         .catch(err => {
@@ -115,7 +115,7 @@ router.post('/products/add', (req, res) => {
             .then(user => {
                 if(!user) 
                 {
-                    console.log("whhee");
+                    console.log("C");
                     return res.status(400).json({'message': 'User not found'});
                 }
                 if(user.type != "V") 
@@ -126,13 +126,13 @@ router.post('/products/add', (req, res) => {
                 console.log(req);
                 let product = new Product(req.body);
                 console.log(product);
-                product.vendor = user
+                product.vendor = user;
                 product.save()
                 .then(product => {
                     res.status(201).json(product);
                 })
                 .catch(err => {
-                    console.log("whwhe");
+                    console.log(err);
                     res.status(400).send(err);
                 });
             })
@@ -159,7 +159,7 @@ router.post('/products/view', (req, res) => {
                 
             if(req.body.type == 1)
             {
-                Product.find({vendor: user, dispatch: false})
+                Product.find({vendor: user, dispatch: false, isDeleted: false, $where: "this.quantity > this.no_orders"})
                 .then( products => {
                     products.forEach(product => {
                         product.vendor = undefined;
@@ -173,7 +173,21 @@ router.post('/products/view', (req, res) => {
 
             else if(req.body.type == 2)
             {
-                Product.find({vendor: user, dispatch: true})
+                Product.find({vendor: user, dispatch: true, isDeleted: false})
+                .then( products => {
+                    products.forEach(product => {
+                        product.vendor = undefined;
+                    })
+                    res.status(200).json(products)
+                })
+                .catch(err => {
+                    res.status(400).send(err);
+                });
+            }
+
+            else if(req.body.type == 3)
+            {
+                Product.find({vendor: user, dispatch: false,  $where: "this.quantity <= this.no_orders", isDeleted: false })
                 .then( products => {
                     products.forEach(product => {
                         product.vendor = undefined;
@@ -207,7 +221,7 @@ router.route('/products/dispatch').post((req, res)=> {
             .then(product => {
                 if(!product) return res.status(400).json({'message': 'Product not found'});
                 if(!product.vendor.equals(user._id)) return res.status(400).json({'message': 'User not authorized'});
-                if(product.quantity > 0) return res.status(400).json({'message': 'Product not ready to dispatch'});
+                if(product.quantity > product.no_orders) return res.status(400).json({'message': 'Product not ready to dispatch'});
 
                 product.dispatch = true
                 product.save()
@@ -235,7 +249,7 @@ router.route('/products/dispatch').post((req, res)=> {
 });
 
 // Delete
-router.route('/products/delete').delete((req, res)=> {
+router.route('/products/delete').post((req, res)=> {
     console.log(req.body);
     console.log(req.headers);
     Authorize(req)
@@ -261,13 +275,15 @@ router.route('/products/delete').delete((req, res)=> {
                         orders.forEach(order => {
                             order.status = "Canceled";
                             order.save();
-                        })
+                        }) 
                     })
                     
                     .catch(err => {
                         res.status(400).send(err);
                     });
-                    product.delete();
+
+                    product.isDeleted = true;
+                    product.save();
                     res.status(200).json({'message': 'Product deleted'});
                     
                 })
@@ -288,7 +304,7 @@ router.route('/products/delete').delete((req, res)=> {
 
 router.post('/products/search', (req, res) => {
 
-    Product.find({name: req.body.name, dispatch: false})
+    Product.find({name: req.body.name, dispatch: false, isDeleted: false})
         .populate({
             path: 'vendor',
         })
@@ -325,18 +341,32 @@ router.post('/orders/place', (req, res) => {
                 Product.findOne({ _id: req.body.product, dispatch: false})
                 .then(product => {
                     if(!product) return res.status(400).json({'message': 'Product not found'});    
-                    product.quantity -= req.body.quantity;
-                    if(product.quantity < 0) product.quantity = 0;
-                    product.save();
-    
+                    // console.log("whaaa");
+                    console.log(product.no_orders, req.body.quantity);
+                    product.no_orders += parseInt(req.body.quantity);
                     let order = new Order(req.body);
                     order.customer = user;
-                    if(product.quantity <= 0)
+
+                    console.log(product.no_orders, product.quantity);
+                    if(product.quantity <= product.no_orders)
+                    {
+                        Order.find({product: product})
+                        .then(orders => {
+                            orders.forEach(order => {
+                                order.status = "Placed";
+                                order.save();
+                            })
+                            res.json(products)})
+                        .catch(err => {res.status(400).send(err); });
                         order.status = "Placed";
+
+                    }
                     order.save();
+                    product.save();
                     res.status(200).json(order);
                 })
                 .catch(err => {
+                    console.log("eee");
                     res.status(400).send(err);
                 });
             })
@@ -422,12 +452,13 @@ router.post('/orders/edit', (req, res) => {
                             { 
                                 console.log(order)
                                 return res.status(400).json({'message': 'Product not found'});
-                            }
-                            if(product.quantity + order.quantity - req.body.quantity < 0) return res.status(400).json({'message': 'Order cannot be placed, quantity exceeded'});
-                            product.quantity  = product.quantity + order.quantity - req.body.quantity;
+                            }  
+                            product.no_orders  =  parseInt(req.body.quantity) - order.quantity;
+                            if(product.no_orders < product.quantity)
+                                product.status = "Waiting";
                             product.save();
-                            order.quantity = req.body.quantity;
-                            order.save()
+                            order.quantity = int(req.body.quantity);
+                            order.save();
                             res.status(200).json(order);
                         })
                         .catch(err => {

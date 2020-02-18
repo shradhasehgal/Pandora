@@ -13,6 +13,8 @@ import AddProduct from "./components/add-product.component";
 import Orders from "./components/order.component";
 import Front from "./components/front.component";
 import Dispatch from "./components/dispatch.component";
+import Reviews from "./components/review.component";
+
 
 
 
@@ -56,6 +58,7 @@ class App extends React.Component {
           <Route path="/add-product" component={AddProduct} />
           <Route path="/orders" component={Orders} />
           <Route path="/dispatch" component={Dispatch} />
+          <Route path="/reviews" component={Reviews} />
 
         </div>
 

@@ -14,6 +14,12 @@ let Product = new mongoose.Schema({
         type: Number,
         required: true
     },
+
+    no_orders: {
+        type: Number,
+        default: 0
+    },
+    
     vendor: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
@@ -28,7 +34,12 @@ let Product = new mongoose.Schema({
     [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product'
-    }]
+    }],
+
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    },
 
 });
 
