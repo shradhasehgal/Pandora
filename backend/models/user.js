@@ -17,7 +17,12 @@ let User = new mongoose.Schema({
     password:{
         type: String,
         required: true,
-    }
+    },
+
+    reviews: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product'
+    }]
 
 });
 

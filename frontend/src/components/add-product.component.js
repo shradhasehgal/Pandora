@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-// import axios from 'axios';
+import axios from 'axios';
 
-export default class CreateUser extends Component {
+export default class AddProduct extends Component {
     
     constructor(props) {
         super(props);
@@ -33,13 +33,20 @@ export default class CreateUser extends Component {
         e.preventDefault();
 
         const newProduct = {
-            name: this.state.username,
-            quantity: this.state.type,
-            price:  this.state.password,
+            name: this.state.name,
+            quantity: this.state.quantity,
+            price:  this.state.price,
         }
 
-        // axios.post('http://localhost:4000/api/products/add', newProduct)
-        //      .then(res => console.log(res.data));
+        let token = localStorage.getItem('token');
+        console.log(token);
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': token
+        }    
+        console.log(newProduct);
+        axios.post('http://localhost:4000/api/products/add', newProduct, {headers: headers})
+             .then(res => console.log(res.data));
 
         this.setState({
             name: '',
@@ -53,10 +60,10 @@ export default class CreateUser extends Component {
             <div>
                 <form onSubmit={this.onSubmit}>
                     <div className="form-group">
-                        <label>Name: </label>
+                        <label>Product name: </label>
                         <input type="text" 
                                className="form-control" 
-                               value={this.state.username}
+                               value={this.state.name}
                                onChange={this.onChangeName}
                                />
                     </div>
@@ -65,7 +72,7 @@ export default class CreateUser extends Component {
                         <label>Price: </label>
                         <input type="number" 
                                className="form-control" 
-                               value={this.state.type}
+                               value={this.state.price}
                                onChange={this.onChangePrice}
                                />  
                     </div>
@@ -73,12 +80,12 @@ export default class CreateUser extends Component {
                         <label>Quantity: </label>
                         <input type="number" 
                                className="form-control" 
-                               value={this.state.password}
+                               value={this.state.quantity}
                                onChange={this.onChangeQuantity}
                                />  
                     </div>
                     <div className="form-group">
-                        <input type="submit" value="Add Product" className="btn btn-primary"/>
+                        <input type="submit" value="Add listing" className="btn btn-primary"/>
                     </div>
                 </form>
             </div>

@@ -10,13 +10,21 @@ export default class VendorNavbar extends Component {
         <div className="collpase navbar-collapse">
         <ul className="navbar-nav mr-auto">
           <li className="navbar-item">
-          <Link to="/" className="nav-link">View products</Link>
+          <Link to="/add-product" className="nav-link">Add listing</Link>
           </li>
           <li className="navbar-item">
-          <Link to="/" className="nav-link">View reviews</Link>
+          <Link to="/listings" className="nav-link">View listings</Link>
           </li>
           <li className="navbar-item">
-          <Link to="/" className="nav-link" onClick={() => {localStorage.clear(); window.location.reload()}}>Logout</Link>
+          <Link to="/dispatch" className="nav-link">Dispatch</Link>
+          </li>
+          <li className="navbar-item">
+          <Link to="/reviews" className="nav-link">Reviews</Link>
+          </li>
+          <li className="navbar-item">
+          <Link className="nav-link" to="/" onClick={() => {
+            localStorage.clear();
+            window.location.href = "/"; }}>Logout</Link>
           </li>
         </ul>
         </div>

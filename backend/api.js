@@ -18,6 +18,8 @@ router.route('/users').get((req, res) => {
 function Authorize(req)
 {
     const token = req.header('Authorization');
+    // console.log('Authorization');
+    // console.log(token);
     return Token.findOne({ token: token })
         .then(token => {
             if(!token) {return null;}
@@ -31,6 +33,7 @@ function Authorize(req)
             return token.user;
         })
         .catch(err => {
+            console.log("Error!");
             res.status(400).send(err);
         });
 };
@@ -50,6 +53,7 @@ router.post('/users/add', (req, res) => {
                 res.status(201).json(user);
             })
             .catch(err => {
+                console.log(err);
                 res.status(400).send(err);
             });
         }
@@ -66,15 +70,12 @@ router.post('/users/login', (req, res) => {
                 bcrypt.compare(req.body.password, user.password, (err, result) => {
                     if (result){
                         Token.findOne({user})
+                            .populate({
+                                path: 'user'
+                            })
                             .then(token => {
-                                // if(token) {
-                                //     token.delete();
-                                //     token = new Token({user: user});
-                                //     token.save();
-                                // }
                                 if(!token)
                                 {
-                                    // console.log("wutt");
                                     token = new Token({user: user});
                                     token.save();
                                 }
@@ -112,19 +113,26 @@ router.post('/products/add', (req, res) => {
         if(!user) return res.status(400).json({'message': 'User not found'});
         User.findOne({_id: user})
             .then(user => {
-                if(!user) return res.status(400).json({'message': 'User not found'});
+                if(!user) 
+                {
+                    console.log("whhee");
+                    return res.status(400).json({'message': 'User not found'});
+                }
                 if(user.type != "V") 
                 {
-                    console.log(user.type)
+                    console.log(user.type);
                     return res.status(401).json({'message': 'User not authorized'});
                 }
+                console.log(req);
                 let product = new Product(req.body);
+                console.log(product);
                 product.vendor = user
                 product.save()
                 .then(product => {
                     res.status(201).json(product);
                 })
                 .catch(err => {
+                    console.log("whwhe");
                     res.status(400).send(err);
                 });
             })
@@ -138,7 +146,7 @@ router.post('/products/add', (req, res) => {
 });
 
 // View Products
-router.get('/products/view', (req, res) => {
+router.post('/products/view', (req, res) => {
 
     Authorize(req)
     .then(user =>{
@@ -149,8 +157,8 @@ router.get('/products/view', (req, res) => {
                 if(user.type != "V") 
                     return res.status(401).json({'message': 'User not authorized'});
                 
-                // if(req.body.type == 1)
-                // {
+            if(req.body.type == 1)
+            {
                 Product.find({vendor: user, dispatch: false})
                 .then( products => {
                     products.forEach(product => {
@@ -161,21 +169,21 @@ router.get('/products/view', (req, res) => {
                 .catch(err => {
                     res.status(400).send(err);
                 });
-               // }
+            }
 
-                // // else if(req.body.type == 2)
-                // // {
-                //     Product.find({vendor: user, dispatch: true})
-                //     .then( products => {
-                //         products.forEach(product => {
-                //             product.vendor = undefined;
-                //         })
-                //         res.status(200).json(products)
-                //     })
-                //     .catch(err => {
-                //         res.status(400).send(err);
-                //     });
-                // }
+            else if(req.body.type == 2)
+            {
+                Product.find({vendor: user, dispatch: true})
+                .then( products => {
+                    products.forEach(product => {
+                        product.vendor = undefined;
+                    })
+                    res.status(200).json(products)
+                })
+                .catch(err => {
+                    res.status(400).send(err);
+                });
+            }
                 
             })
             .catch(err => {1
@@ -199,7 +207,7 @@ router.route('/products/dispatch').post((req, res)=> {
             .then(product => {
                 if(!product) return res.status(400).json({'message': 'Product not found'});
                 if(!product.vendor.equals(user._id)) return res.status(400).json({'message': 'User not authorized'});
-                if(product.quantity) return res.status(400).json({'message': 'Product not ready to dispatch'});
+                if(product.quantity > 0) return res.status(400).json({'message': 'Product not ready to dispatch'});
 
                 product.dispatch = true
                 product.save()
@@ -228,10 +236,15 @@ router.route('/products/dispatch').post((req, res)=> {
 
 // Delete
 router.route('/products/delete').delete((req, res)=> {
-
+    console.log(req.body);
+    console.log(req.headers);
     Authorize(req)
     .then(user =>{
-        if(!user) return res.status(401).json({'message': 'User not found'});
+        if(!user) 
+        {
+            // console.log("REEEE");
+            return res.status(401).json({'message': 'User not found'});
+        }
         User.findOne({_id: user})
             .then(user => {
                 if(!user) return res.status(400).json({'message': 'User not found'});
@@ -275,8 +288,15 @@ router.route('/products/delete').delete((req, res)=> {
 
 router.post('/products/search', (req, res) => {
 
-    Product.find({name: req.body.name, quantity: {$gt: 0}})
-        .then(products => res.json(products))
+    Product.find({name: req.body.name, dispatch: false})
+        .populate({
+            path: 'vendor',
+        })
+        .then(products => {
+            products.forEach(product => {
+                product.vendor.password = undefined;
+            })
+            res.json(products)})
         .catch(err => {res.status(400).send(err); });
 
 });
@@ -302,17 +322,16 @@ router.post('/orders/place', (req, res) => {
                 if(user.type != "C") 
                     return res.status(401).json({'message': 'User not authorized to place orders'});
                 
-                Product.findOne({ _id: req.body.product })
+                Product.findOne({ _id: req.body.product, dispatch: false})
                 .then(product => {
-                    if(!product) return res.status(400).json({'message': 'Product not found'});
-                    if(product.quantity < req.body.quantity) return res.status(400).json({'message': 'Order cannot be placed, quantity exceeded'});
-    
+                    if(!product) return res.status(400).json({'message': 'Product not found'});    
                     product.quantity -= req.body.quantity;
+                    if(product.quantity < 0) product.quantity = 0;
                     product.save();
     
                     let order = new Order(req.body);
                     order.customer = user;
-                    if(product.quantity == 0)
+                    if(product.quantity <= 0)
                         order.status = "Placed";
                     order.save();
                     res.status(200).json(order);
@@ -335,12 +354,20 @@ router.get('/orders/view', (req, res) => {
 
     Authorize(req)
     .then(user =>{
-        if(!user) return res.status(400).json({'message': 'User not found'});
+        if(!user) 
+        {
+            console.log("Error! ");
+            console.log(req);
+            console.log(req.headers);
+            console.log(req.header('Authorization'));
+            return res.status(400).json({'message': 'User not found'});
+        }
         User.findOne({_id: user})
             .then(user => {
-                if(!user) return res.status(400).json({'message': 'User not found'});
+                if(!user) 
+                    return res.status(400).json({'message': 'User not found'});
                 if(user.type != "C") 
-                    return res.status(401).json({'message': 'Vendor type: user does not have any orders'});
+                return res.status(401).json({'message': 'Vendor type: user does not have any orders'});
                 
 
                 Order.find({customer: user})
@@ -351,7 +378,11 @@ router.get('/orders/view', (req, res) => {
                     }
                 })
                 .exec((err, orders) => {
-                    if(err) res.status(400).json(err);
+                    if(err) 
+                    {
+                        console.log("erro");
+                        res.status(400).json(err);
+                    }
                     else 
                     {
                         orders.forEach(order => {
@@ -362,6 +393,7 @@ router.get('/orders/view', (req, res) => {
                 })
             })
             .catch(err => {
+                console.log("Error! ");
                 res.status(400).send(err);
             });
      })
@@ -445,7 +477,7 @@ router.route('/orders').get((req, res) => {
 
 // Reviews
 
-router.post('/reviews', (req, res) => {
+router.post('/products/reviews', (req, res) => {
 
     Authorize(req)
     .then(user =>{
@@ -461,13 +493,15 @@ router.post('/reviews', (req, res) => {
                         console.log(order.customer, user._id);                           
                         return res.status(400).json({'message':'Order not placed by user, cannot review'});
                     }
-                    // if(order.status!= "Dispatched") return res.status(400).json({'message':'Product not dispatched, cannot review'});
+                    if(order.status!= "Dispatched") return res.status(400).json({'message':'Product not dispatched, cannot review'});
     
                     Product.findOne({ _id: order.product })
                         .then(product => {
                             if(!product) return res.status(400).json({'message': 'Product not found'});
-                            let review = new Review({vendor: product.vendor, customer: user, review: req.body.review, rating: req.body.rating});
+                            let review = new Review({review: req.body.review, rating: req.body.rating});
                             review.save(); 
+                            product.reviews.push(review);
+                            product.save();
                             res.status(200).json(review);
                         })
                         .catch(err => {
@@ -487,7 +521,52 @@ router.post('/reviews', (req, res) => {
     });    
 });
 
+router.post('/vendors/reviews', (req, res) => {
 
+    Authorize(req)
+    .then(user =>{
+        if(!user) return res.status(400).json({'message': 'User not found'});
+        User.findOne({_id: user})
+            .then(user => {
+                if(!user) return res.status(400).json({'message': 'User not found'});
+                Order.findOne({ _id: req.body.id })
+                .then(order => {
+                    if(!order) return res.status(400).json({'message': 'Order not found'});
+                    if(!order.customer.equals(user._id))
+                    { 
+                        console.log(order.customer, user._id);                           
+                        return res.status(400).json({'message':'Order not placed by user, cannot review'});
+                    }
+                    if(order.status == "Waiting" || order.status == "Canceled") return res.status(400).json({'message':'Product not placed, cannot review'});
+    
+                    Product.findOne({ _id: order.product })
+                        .then(product => {
+                            if(!product) return res.status(400).json({'message': 'Product not found'});
+                            Vendor.findOne({ _id: product.vendor })
+                                .then(vendor => {
+                                    if(!vendor) return res.status(400).json({'message': 'Product not found'});
+                                    let review = new Review({rating: req.body.rating});
+                                    review.save();
+                                    vendor.reviews.push(review); 
+                                    res.status(200).json(review);
+                            })
+                        })
+                        .catch(err => {
+                            res.status(400).json(err);
+                        });
+                })
+                .catch(err => {
+                    res.status(400).send(err);
+                });
+            })
+            .catch(err => {
+                res.status(400).send(err);
+            });
+    })
+    .catch(err => {
+        res.status(400).send(err);
+    });    
+});
 
 router.get('/vendors/view', (req, res) => {
 

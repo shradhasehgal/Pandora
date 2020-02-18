@@ -40,15 +40,15 @@ export default class Login extends Component {
                 localStorage.setItem('user_type', res.data.token.user.type);
                 localStorage.setItem('user_name', res.data.token.user.username);
                 localStorage.setItem('user_id', res.data.token.user._id);
-                this.props.history.push("/dashboard");
+                this.props.history.push("/");
                 window.location.reload();
             })
             .catch(err => console.log(err));
 
-        this.setState({
-            username: '',
-            password: '',
-        });
+        // this.setState({
+        //     username: '',
+        //     password: '',
+        // });
     }
 
     render() {

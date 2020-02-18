@@ -9,6 +9,7 @@ export default class Search extends Component {
 
         this.state = {
             search: '',
+            products: []
         }
         this.onChangeSearch = this.onChangeSearch.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -26,12 +27,13 @@ export default class Search extends Component {
         }
 
         console.log(Search);
-        axios.get('http://localhost:4000/api/products')
-            .then(res => console.log(res.data))
-            .catch(err => console.log(err));
 
-        axios.get('http://localhost:4000/api/products/search', Search)
-             .then(res => console.log(res.data))
+        axios.post('http://localhost:4000/api/products/search', Search)
+             .then(res => {
+                console.log(res.data);
+                this.setState({products: res.data});
+
+            })
              .catch(err => console.log(err));
 
         this.setState({
@@ -55,6 +57,33 @@ export default class Search extends Component {
                         <input type="submit" value="Search" className="btn btn-primary"/>
                     </div>
                 </form>
+
+                <table className="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity left</th>
+                            <th>Vendor</th>
+                            <th>Purchase</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    { 
+                        this.state.products.map((Product, i) => {
+                            return (
+                                <tr key={i}>
+                                    <td>{Product.name}</td>
+                                    <td>{Product.price} </td>
+                                    <td> {Product.quantity} </td>
+                                    <td>{Product.vendor.username} </td>
+                                    <td> YEET </td>
+                                </tr>
+                            )
+                        })
+                    }
+                    </tbody>
+                </table>
             </div>
         )
     }

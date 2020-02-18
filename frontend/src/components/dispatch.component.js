@@ -1,25 +1,24 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 
-export default class OrdersList extends Component {
+export default class Dispatch extends Component {
     
     constructor(props) {
         super(props);
-        this.state = {orders: []}
+        this.state = {listings: []}
     }
 
     componentDidMount() {
         let token = localStorage.getItem('token');
-        console.log(token);
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': token
           }    
 
-        axios.get('http://localhost:4000/api/orders/view' ,{ headers: headers} )
+        axios.post('http://localhost:4000/api/products/view',{'type': 2},{ headers: headers} )
              .then(response => {
                 console.log(response.data)
-                this.setState({orders: response.data});
+                this.setState({listings: response.data});
              })
              .catch(function(error) {
                  console.log(error);
@@ -33,20 +32,18 @@ export default class OrdersList extends Component {
                     <thead>
                         <tr>
                             <th>Product</th>
-                            <th>Quantity</th>
-                            <th>Status</th>
-                            <th>Vendor</th>
+                            <th>Quantity left</th>
+                            <th>Remove</th>
                         </tr>
                     </thead>
                     <tbody>
                     { 
-                        this.state.orders.map((Order, i) => {
+                        this.state.listings.map((product, i) => {
                             return (
                                 <tr key={i}>
-                                    <td>{Order.product.name}</td>
-                                    <td>{Order.quantity} </td>
-                                    <td>{Order.status} </td>
-                                    <td>{Order.product.vendor.username} </td>
+                                    <td>{product.name}</td>
+                                    <td>{product.quantity} </td>
+                                    <td> YEET </td>
                                 </tr>
                             )
                         })

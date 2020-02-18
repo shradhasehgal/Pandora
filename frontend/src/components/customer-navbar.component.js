@@ -5,8 +5,9 @@ export default class CustomerNavbar extends Component {
 
   render() {
     return (
+      <div>
       <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
-        <Link to="/" className="navbar-brand">Shopping App</Link>
+        <Link to="/" className="navbar-brand"> Shopping Cart </Link>
         <div className="collpase navbar-collapse">
         <ul className="navbar-nav mr-auto">
           <li className="navbar-item">
@@ -16,11 +17,14 @@ export default class CustomerNavbar extends Component {
           <Link to="/orders" className="nav-link">View orders</Link>
           </li>
           <li className="navbar-item">
-          <Link to="/" className="nav-link" onClick={() => {localStorage.clear(); window.location.reload();}}>Logout</Link>
+          <Link className="nav-link" to="/" onClick={() => {
+            localStorage.clear();
+            window.location.href = "/"; }}>Logout</Link>
           </li>
         </ul>
         </div>
       </nav>
+     </div>
     );
   }
 }

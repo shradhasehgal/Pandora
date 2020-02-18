@@ -8,10 +8,12 @@ import VendorNavbar from "./components/vendor-navbar.component"
 import Register from "./components/register.component";
 import Login from "./components/login.component";
 import Search from "./components/product-search.component";
-import Product from "./components/product.component";
-import Vendor from "./components/vendor-product.component";
+import Listings from "./components/product-listings.component";
+import AddProduct from "./components/add-product.component";
 import Orders from "./components/order.component";
 import Front from "./components/front.component";
+import Dispatch from "./components/dispatch.component";
+
 
 
 
@@ -33,17 +35,28 @@ class App extends React.Component {
           {navbar}
           <br></br>
           <Route exact path="/" render={()=> {
-            if(user_type === "V") return <Orders/>
-            else if(user_type === "C") return <Orders/>
+            if(user_type === "V") 
+            {
+              console.log("1");
+              return <AddProduct/>
+            }
+              else if(user_type === "C") 
+              {
+                console.log("2");
+                return <Orders/>
+              }
+
             else return <Front/>
           }}  />
+          <Route path="/front" component={Front} />
           <Route path="/register" component={Register} />
           <Route path="/login" component={Login} />
           <Route path="/search" component={Search} />
-          <Route path="/products" component={Product} />
-          <Route path="/vendor" component={Vendor} />
+          <Route path="/listings" component={Listings} />
+          <Route path="/add-product" component={AddProduct} />
           <Route path="/orders" component={Orders} />
-          <Route path="/dashboard" component={Orders} />
+          <Route path="/dispatch" component={Dispatch} />
+
         </div>
 
       </Router>
