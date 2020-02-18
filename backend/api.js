@@ -640,6 +640,8 @@ router.post('/vendors/reviews', (req, res) => {
                         console.log(review);
                         review.save();
                         vendor.reviews.push(review); 
+                        vendor.save();
+                        console.log(vendor);
                         res.status(200).json(review);
                 })
             })
@@ -655,20 +657,22 @@ router.post('/vendors/reviews', (req, res) => {
 
 router.get('/vendors/review', (req, res) => {
     
-    let lis = []
-    User.findOne({ _id: req.body.id})
-        .then(vendor => {
-            Product.find({vendor: vendor})
-            .then(products => 
-                {
-                    lis.append()
-                })
-            .catch(err => {
-               res.status(400).send(err);
+    Product.find({vendor: req.body.id}) // All orders
+    .then( products => {
+        products.forEach(product => {
+            let reviews = product.reviews;
+            reviews.forEach({vendor: req.body.id}) // All orders
+            .then( products => {
+                products.forEach(product => {
+                    product.review.review = ;
             })
-        .catch(err => { res.status(400).send(err);});
-
+        })
+        res.status(200).json(products)
     })
+    .catch(err => {
+        res.status(400).send(err);
+    });
+        
 });
 
 

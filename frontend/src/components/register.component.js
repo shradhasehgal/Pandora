@@ -8,7 +8,7 @@ export default class CreateUser extends Component {
         this.state = {
             username: '',
             password:'',
-            type: ''
+            type: 'C'
         }
         this.onChangePassword = this.onChangePassword.bind(this);
         this.onChangeUsername = this.onChangeUsername.bind(this);

@@ -70,6 +70,7 @@ export default class Search extends Component {
     }
 
     render() {
+        // const { products} = this.state;
         return (
             <div>
                 <form onSubmit={this.onSubmit}>
@@ -98,7 +99,7 @@ export default class Search extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                    { 
+                    {
                         this.state.products.map((Product, i) => {
                             let left = 0;
                             if(Product.quantity > Product.no_orders) left = Product.quantity - Product.no_orders; 

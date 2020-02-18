@@ -78,7 +78,7 @@ export default class Listings extends Component {
                                         <option name="5" value="5">5</option>
                                     </select>
                                     {/* <td><input type="number" value={this.state.quantity} onChange={this.onChangeQuantity}/> </td> */}
-                                    <td><button onClick={() => {this.rateVendor(order.product.vendor._id, i) }}>Rate</button></td>
+                                    <td><button onClick={() => {this.rateVendor(order.product.vendor._id, order._id) }}>Rate</button></td>
                                 </tr>
                             
                             )
