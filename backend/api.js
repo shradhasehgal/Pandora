@@ -85,7 +85,7 @@ router.post('/users/login', (req, res) => {
                                 res.status(200).send({token});
                             })
                             .catch(err => {
-                                res.status(400).send(err);
+                                res.status(400).send({'message': 'Token invalid'});
                             });
                     }
                     else res.status(400).send({'message': 'Password Incorrect'});
@@ -304,11 +304,13 @@ router.route('/products/delete').post((req, res)=> {
 
 router.post('/products/search', (req, res) => {
 
-    Product.find({name: req.body.name, dispatch: false, isDeleted: false})
+    if(req.body.type == 1)
+    {
+        Product.find({name: req.body.name, dispatch: false, isDeleted: false})
         .populate({
             path: 'vendor',
             
-        })
+        }).sort({price: 1})
         .then(products => {
             products.forEach(product => {
                 product.vendor.password = undefined;
@@ -318,6 +320,48 @@ router.post('/products/search', (req, res) => {
             console.log(products);
         })
         .catch(err => {res.status(400).send(err); });
+
+    }
+
+    
+    else if(req.body.type == 2)
+    {
+        Product.find({name: req.body.name, dispatch: false, isDeleted: false})
+        .populate({
+            path: 'vendor',
+            
+        })
+        .then(products => {
+            products.forEach(product => {
+                product.vendor.password = undefined;
+                console.log(product.vendor);
+            }).sort({ no_orders: -1})
+            res.json(products);
+            console.log(products);
+        })
+        .catch(err => {res.status(400).send(err); });
+
+    }
+    
+    if(req.body.type == 3)
+    {
+        Product.find({name: req.body.name, dispatch: false, isDeleted: false})
+        .populate({
+            path: 'vendor',
+            
+        }).sort({rating: -1})
+        .then(products => {
+            products.forEach(product => {
+                product.vendor.password = undefined;
+                console.log(product.vendor);
+            })
+            res.json(products);
+            console.log(products);
+        })
+        .catch(err => {res.status(400).send(err); });
+
+    }
+
 
 });
 

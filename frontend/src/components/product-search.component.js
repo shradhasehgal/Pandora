@@ -11,9 +11,11 @@ export default class Search extends Component {
 
         this.state = {
             search: '',
-            products: []
+            products: [],
+            type: 1
         }
         this.onChangeSearch = this.onChangeSearch.bind(this);
+        this.onChangeType = this.onChangeType.bind(this);
         this.onChangeQuantity = this.onChangeQuantity.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.placeOrder = this.placeOrder.bind(this);
@@ -27,11 +29,17 @@ export default class Search extends Component {
         this.setState({ quantity: event.target.value });
     }
 
+
+    onChangeType(event) {
+        this.setState({ type: event.target.value });
+    }
+
     onSubmit(e) {
         e.preventDefault();
 
         const Search = {
             name: this.state.search,
+            type: this.state.type
         }
 
         console.log(Search);
@@ -84,6 +92,13 @@ export default class Search extends Component {
                                value={this.state.search}
                                onChange={this.onChangeSearch}
                                />  
+                    </div>
+                    <div className="form-group">
+                    <select className="form-control"  value={this.state.type} onChange={this.onChangeType}> 
+                        <option name="1" value="1">Order by price</option>
+                        <option name="2" value="2">Order by quantity</option>
+                        <option name="3" value="3">Order by vendor rating</option>
+                    </select>
                     </div>
                     <div className="form-group">
                         <input type="submit" value="Search" className="btn btn-primary"/>
