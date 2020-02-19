@@ -26,7 +26,9 @@ export default class Reviews extends Component {
                 this.setState({listings: response.data});
              })
              .catch(function(error) {
-                 console.log(error);
+                if(error.response.data.message)
+                alert(error.response.data.message);
+                console.log(error);
             })
         
 

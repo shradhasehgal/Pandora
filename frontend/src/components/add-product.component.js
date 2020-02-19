@@ -46,8 +46,12 @@ export default class AddProduct extends Component {
         }    
         console.log(newProduct);
         axios.post('http://localhost:4000/api/products/add', newProduct, {headers: headers})
-             .then(res => console.log(res.data));
-
+            .then(res => console.log(res.data))
+            .catch(function(error) {
+                if(error.response.data.message)
+                    alert(error.response.data.message);
+                console.log(error);
+            })
         this.setState({
             name: '',
             quantity: '',

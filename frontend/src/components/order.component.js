@@ -28,6 +28,8 @@ export default class OrdersList extends Component {
                 this.setState({orders: response.data});
              })
              .catch(function(error) {
+                if(error.response.data.message)
+                alert(error.response.data.message);
                  console.log(error);
              })
     }

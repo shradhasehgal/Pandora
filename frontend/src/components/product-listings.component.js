@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import axios from 'axios';
+// import "bootstrap/dist/css/bootstrap.min.css";
+import Button from 'react-bootstrap/Button'
 
 export default class Listings extends Component {
     
@@ -22,6 +24,8 @@ export default class Listings extends Component {
                 this.setState({listings: response.data});
              })
              .catch(function(error) {
+                if(error.response.data.message)
+                alert(error.response.data.message);
                  console.log(error);
              })
     }
@@ -65,7 +69,7 @@ export default class Listings extends Component {
                                 <tr key={i} deleteProduct = {this.deleteProduct}>
                                     <td>{product.name}</td>
                                     <td>{left} </td>
-                                    <td> <a href="#" onClick={() => {this.deleteProduct(product._id) }}>delete</a></td>
+                                    <td> <Button variant="danger" onClick={() => {this.deleteProduct(product._id) }}>Delete</Button></td>
                                 </tr>
                             )
                         })

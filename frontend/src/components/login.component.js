@@ -34,16 +34,24 @@ export default class Login extends Component {
 
         console.log(User)
         axios.post('http://localhost:4000/api/users/login', User)
-            .then(res => {
-                console.log(res.data.message);
-                localStorage.setItem('token', res.data.token.token);
-                localStorage.setItem('user_type', res.data.token.user.type);
-                localStorage.setItem('user_name', res.data.token.user.username);
-                localStorage.setItem('user_id', res.data.token.user._id);
+            .then(response => {
+                console.log(response.data.message);
+                localStorage.setItem('token', response.data.token.token);
+                localStorage.setItem('user_type', response.data.token.user.type);
+                localStorage.setItem('user_name', response.data.token.user.username);
+                localStorage.setItem('user_id', response.data.token.user._id);
                 this.props.history.push("/");
                 window.location.reload();
             })
-            .catch(err => {alert(err); console.log(err)});
+            .catch(err => {
+                if(err.response.data.message)
+                    alert(err.response.data.message);
+                console.log(err.response);
+                this.setState({
+                    username : '',
+                    password:''
+                });
+            });
 
     }
 

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const mongoose_fuzzy_searching = require('mongoose-fuzzy-searching');
 let Product = new mongoose.Schema({
     name: {
         type: String,
@@ -42,5 +42,10 @@ let Product = new mongoose.Schema({
     },
 
 });
+
+const EventsSchema = mongoose.Schema(Product);
+EventsSchema.plugin(mongoose_fuzzy_searching, {fields: ['name']});
+const Events = mongoose.model('Events', EventsSchema);
+Events.fuzzySearch('Nodejs meetup').then(console.log).catch(console.error);
 
 module.exports = mongoose.model('Product', Product);

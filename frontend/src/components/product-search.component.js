@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import axios from 'axios';
 // import CustomerNavbar from "./user-navbar.component"
 import { BrowserRouter as Router, Route, Link} from "react-router-dom";
+import Button from 'react-bootstrap/Button'
 
 
 export default class Search extends Component {
@@ -15,11 +16,16 @@ export default class Search extends Component {
             type: 1
         }
         this.onChangeSearch = this.onChangeSearch.bind(this);
-        this.onChangeType = this.onChangeType.bind(this);
+        this.sortbyRating = this.sortbyRating.bind(this);
+        this.sortbyQuantity = this.sortbyQuantity.bind(this);
+        this.sortbyPrice = this.sortbyPrice.bind(this);
+        // this.onChangeType = this.onChangeType.bind(this);
         this.onChangeQuantity = this.onChangeQuantity.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.placeOrder = this.placeOrder.bind(this);
     }
+
+
     
     onChangeSearch(event) {
         this.setState({ search: event.target.value });
@@ -36,21 +42,24 @@ export default class Search extends Component {
 
     onSubmit(e) {
         e.preventDefault();
-
         const Search = {
             name: this.state.search,
             type: this.state.type
         }
 
         console.log(Search);
-
         axios.post('http://localhost:4000/api/products/search', Search)
              .then(res => {
                 console.log(res.data);
                 this.setState({products: res.data});
 
             })
-             .catch(err => console.log(err));
+             .catch(err =>
+                {
+                    if(err.response.data.message)
+                    alert(err.response.data.message);
+                    console.log(err)
+                });
 
         this.setState({
             search : ''
@@ -80,6 +89,64 @@ export default class Search extends Component {
         window.location.reload();
     }
 
+
+    sortbyQuantity = () =>{
+        let products = this.state.products, n = products.length;
+        for(var i =0; i < n-1; i++)
+        {
+            for(var j=0; j < n-1; j++)
+            {
+                var left = products[j].no_orders - products[j].quantity;
+                var left2 = products[j+1].no_orders - products[j+1].quantity;
+                if(left < left2)
+                {
+                    var temp = products[j];
+                    products[j] = products[j+1];
+                    products[j+1] = temp;
+                }
+            }
+        }
+        this.setState({products: products});
+    }
+
+    sortbyRating = () =>{
+        let products = this.state.products, n = products.length;
+        for(var i =0; i < n-1; i++)
+        {
+            for(var j=0; j < n-1; j++)
+            {
+                var left = products[j].vendor.rating;
+                var left2 = products[j+1].vendor.rating;
+                if(left < left2)
+                {
+                    var temp = products[j];
+                    products[j] = products[j+1];
+                    products[j+1] = temp;
+                }
+            }
+        }
+        this.setState({products: products});
+    }
+
+    sortbyPrice = () =>{
+        let products = this.state.products, n = products.length;
+        for(var i =0; i < n-1; i++)
+        {
+            for(var j=0; j < n-1; j++)
+            {
+                var left = products[j].price;
+                var left2 = products[j+1].price;
+                if(left > left2)
+                {
+                    var temp = products[j];
+                    products[j] = products[j+1];
+                    products[j+1] = temp;
+                }
+            }
+        }
+        this.setState({products: products});
+    }
+
     render() {
         // const { products} = this.state;
         return (
@@ -94,16 +161,14 @@ export default class Search extends Component {
                                />  
                     </div>
                     <div className="form-group">
-                    <select className="form-control"  value={this.state.type} onChange={this.onChangeType}> 
-                        <option name="1" value="1">Order by price</option>
-                        <option name="2" value="2">Order by quantity</option>
-                        <option name="3" value="3">Order by vendor rating</option>
-                    </select>
-                    </div>
-                    <div className="form-group">
                         <input type="submit" value="Search" className="btn btn-primary"/>
                     </div>
                 </form>
+                <Button variant="info" onClick={this.sortbyPrice} >Order by price</Button> &nbsp; &nbsp;
+                <Button variant="info" onClick={this.sortbyQuantity} >Order by quantity</Button>&nbsp; &nbsp;
+                <Button variant="info" onClick={this.sortbyRating} >Order by rating</Button>
+                <br></br>
+                <br></br>
 
                 <table className="table table-striped">
                     <thead>
@@ -119,6 +184,7 @@ export default class Search extends Component {
                     </thead>
                     <tbody>
                     {
+
                         this.state.products.map((Product, i) => {
                             console.log(Product.vendor);
                             let left = 0, rating =0;
@@ -136,7 +202,7 @@ export default class Search extends Component {
                                     <td>{rating}</td>
                                     {/* <form onSubmit={this.onOrder}> */}
                                     <td><input type="number" value={this.state.quantity} onChange={this.onChangeQuantity}/> </td>
-                                    <td><button onClick={() => {this.placeOrder(Product._id) }}>Buy</button></td>
+                                    <td><Button variant="success" onClick={() => {this.placeOrder(Product._id) }}>Buy</Button></td>
                                 </tr>
                             )
                         })

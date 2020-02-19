@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import axios from 'axios';
+import Button from 'react-bootstrap/Button'
 
 export default class Listings extends Component {
     
@@ -27,6 +28,8 @@ export default class Listings extends Component {
                 this.setState({listings: response.data});
              })
              .catch(function(error) {
+                if(error.response.data.message)
+                alert(error.response.data.message);
                  console.log(error);
              })
     }
@@ -83,6 +86,8 @@ export default class Listings extends Component {
                                     <td>{order.product.name}</td>
                                     <td>{order.product.vendor.username}</td>
                                     <td><input type="text" value={this.state.text} onChange={this.onChangeText}/> </td>
+                                    <div className="form-group">
+
                                     <select className="form-control"  value={this.state.quantity} onChange={this.onChangeQuantity}> 
                                         <option name="1" value="1">1</option>
                                         <option name="2" value="2">2</option>
@@ -90,7 +95,8 @@ export default class Listings extends Component {
                                         <option name="4" value="4">4</option>
                                         <option name="5" value="5">5</option>
                                     </select>
-                                    <td><button onClick={() => {this.rateVendor(order._id) }}>Rate</button></td>
+                                    </div>
+                                    <td><Button variant="primary" onClick={() => {this.rateVendor(order._id) }}>Rate</Button></td>
                                 </tr>
                             
                             )

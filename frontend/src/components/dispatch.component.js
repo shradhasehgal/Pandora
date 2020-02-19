@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import axios from 'axios';
+import Button from 'react-bootstrap/Button'
 
 export default class Dispatch extends Component {
     
@@ -24,6 +25,8 @@ export default class Dispatch extends Component {
                 this.setState({listings: response.data});
             })
             .catch(function(error) {
+                if(error.response.data.message)
+                    alert(error.response.data.message);
                 console.log(error);
             })
     }
@@ -41,7 +44,10 @@ export default class Dispatch extends Component {
         }    
         axios.post('http://localhost:4000/api/products/dispatch',Product, {headers: headers})
             .then(response => { console.log(response.data)})
-            .catch(err => console.log(err));
+            .catch(err => {
+                if(err.response.data.message)
+                    alert(err.response.data.message);
+                console.log(err)});
     
         window.location.reload();
     
@@ -66,7 +72,7 @@ export default class Dispatch extends Component {
                                 <tr key={i}>
                                     <td>{product.name}</td>
                                     <td>{product.no_orders}</td>
-                                    <td><button onClick={() => {this.productDispatch(product._id) }}>Dispatch</button></td>
+                                    <td><Button variant="success" onClick={() => {this.productDispatch(product._id) }}>Dispatch</Button></td>
                                 </tr>
                             )
                         })

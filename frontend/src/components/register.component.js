@@ -8,7 +8,7 @@ export default class CreateUser extends Component {
         this.state = {
             username: '',
             password:'',
-            type: 'C'
+            type: "C"
         }
         this.onChangePassword = this.onChangePassword.bind(this);
         this.onChangeUsername = this.onChangeUsername.bind(this);
@@ -39,12 +39,15 @@ export default class CreateUser extends Component {
         console.log(newUser);
         axios.post('http://localhost:4000/api/users/add', newUser)
              .then(res => console.log(res.data))
-             .catch(err => console.log(err));
+             .catch(err => {
+                if(err.response.data.name)
+                    alert(err.response.data.name);
+                console.log(err)});
 
         this.setState({
             username: '',
             password: '',
-            type: ''
+            type: 'C'
         });
     }
 
@@ -83,7 +86,7 @@ export default class CreateUser extends Component {
                     </div>     
 
                     <div className="form-group">
-                        <input type="submit" value="Create User" className="btn btn-primary"/>
+                        <input type="submit" value="Register" className="btn btn-primary"/>
                     </div>
                 </form>
             </div>

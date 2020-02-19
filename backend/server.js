@@ -24,7 +24,7 @@ app.use('/api', api);
 
 const eraseDatabaseOnSync = false;
 
-mongoose.connect('mongodb://127.0.0.1:27017/spopp', { useNewUrlParser: true })
+mongoose.connect('mongodb://127.0.0.1:27017/bestapp', { useNewUrlParser: true })
 .then(async () => {
     if (eraseDatabaseOnSync) {
         await Promise.all([
