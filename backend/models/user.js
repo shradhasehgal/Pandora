@@ -6,7 +6,8 @@ let User = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        trim: true
+        trim: true,
+        minlength: 3
     },
     type:{
         type: String,
@@ -17,6 +18,7 @@ let User = new mongoose.Schema({
     password:{
         type: String,
         required: true,
+        minlength: 3
     },
 
     no_reviews: {

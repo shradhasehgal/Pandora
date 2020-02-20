@@ -72,7 +72,7 @@ export default class Dispatch extends Component {
                                 <tr key={i}>
                                     <td>{product.name}</td>
                                     <td>{product.no_orders}</td>
-                                    <td><Button variant="success" onClick={() => {this.productDispatch(product._id) }}>Dispatch</Button></td>
+                                    <td><Button variant="warning" onClick={() => {this.productDispatch(product._id) }}>Dispatch</Button></td>
                                 </tr>
                             )
                         })

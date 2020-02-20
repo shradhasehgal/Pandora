@@ -16,6 +16,8 @@ import Dispatch from "./components/dispatch.component";
 import Reviews from "./components/review.component";
 import ProductReview from "./components/product-review.component";
 import VendorReview from "./components/vendor-review.component";
+import Edit from "./components/edit.component"
+
 
 
 
@@ -63,6 +65,7 @@ class App extends React.Component {
           <Route path="/vendor" component={Reviews} />
           <Route path="/product-review" component={ProductReview} />
           <Route path="/vendor-review" component={VendorReview} />
+          <Route path="/edit" component={Edit} />
 
         </div>
 

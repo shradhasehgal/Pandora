@@ -29,7 +29,8 @@ function Authorize(req)
             //     token = new Token({user});
             //     token.save();
             // }
-            // // console.log(token.user)
+            // console.log("whiopp");
+            // console.log(token.user);
             return token.user;
         })
         .catch(err => {
@@ -452,13 +453,15 @@ router.get('/orders/view', (req, res) => {
                 .exec((err, orders) => {
                     if(err) 
                     {
-                        console.log("erro");
+                        console.log("error");
                         res.status(400).json(err);
                     }
                     else 
                     {
                         orders.forEach(order => {
                             order.product.vendor.password = undefined;
+                            if(order.product.no_orders > order.product.quantity) order.quantity = 0;
+                            else order.quantity = order.product.quantity - order.product.no_orders;
                         })
                         res.status(200).json(orders);
                     }
@@ -552,30 +555,47 @@ router.post('/orders/edit', (req, res) => {
 
     Authorize(req)
     .then(user =>{
+        // console.log("whie");
+        // console.log(user);
         if(!user) return res.status(400).json({'message': 'User not found'});
         User.findOne({_id: user})
             .then(user => {
-                if(!user) return res.status(400).json({'message': 'User not found'});
-                // if(user.type != "C") 
-                //     return res.status(401).json({'message': 'Vendor type: user does not have any orders'});
+                // if(!user) return res.status(400).json({'message': 'User not found'});
+                if(user.type != "C") 
+                    return res.status(401).json({'message': 'Vendor type: user does not have any orders'});
                 
-                // console.log("wheee")
                 Order.findOne({_id: req.body.id})
                     .then( order => {
-                        console.log(order)
+                        console.log(order);
                         if(!order) return res.status(400).json({'message': 'Order not found'});
                         Product.findOne({ _id: order.product })
                         .then(product => {
                             if(!product)
                             { 
-                                console.log(order)
+                                // console.log("poop");
+                                // console.log(order);
                                 return res.status(400).json({'message': 'Product not found'});
                             }  
-                            product.no_orders  =  parseInt(req.body.quantity) - order.quantity;
+                            product.no_orders  =  product.no_orders + parseInt(req.body.quantity) - order.quantity;
                             if(product.no_orders < product.quantity)
                                 product.status = "Waiting";
+                            else 
+                            {
+                                Order.find({product: product})
+                                .then(orders => {
+                                    orders.forEach(order => {
+                                        order.status = "Placed";
+                                        order.save();
+                                    })
+                                    res.json(products)})
+                                .catch(err => {res.status(400).send(err); });
+                                order.status = "Placed";
+                                product.status = "Placed";
+                            }
+                            // console.log("wwwuyut");
+
                             product.save();
-                            order.quantity = int(req.body.quantity);
+                            order.quantity = parseInt(req.body.quantity);
                             order.save();
                             res.status(200).json(order);
                         })

@@ -38,7 +38,12 @@ export default class CreateUser extends Component {
         }
         console.log(newUser);
         axios.post('http://localhost:4000/api/users/add', newUser)
-             .then(res => console.log(res.data))
+             .then(res => 
+            {
+                let noice = "Happy to have you on board, "+ res.data.username +"!";
+                alert(noice);
+                console.log(res.data)
+            })
              .catch(err => {
                 if(err.response.data.name)
                     alert(err.response.data.name);

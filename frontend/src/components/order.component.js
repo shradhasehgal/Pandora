@@ -1,5 +1,8 @@
 import React, {Component} from 'react';
 import axios from 'axios';
+import Button from 'react-bootstrap/Button'
+import { Link } from 'react-router-dom';
+
 
 export default class OrdersList extends Component {
     
@@ -7,7 +10,6 @@ export default class OrdersList extends Component {
         super(props);
         this.state = {orders: []};
         this.onChangeQuantity = this.onChangeQuantity.bind(this);
-
     }
 
     onChangeQuantity(event) {
@@ -34,9 +36,15 @@ export default class OrdersList extends Component {
              })
     }
 
+    
+
+
     render() {
+        let user = localStorage.getItem('user_name');
         return (
             <div>
+                <h2>{user}'s orders:</h2>
+                <br></br>
                 <table className="table table-striped">
                     <thead>
                         <tr>
@@ -44,19 +52,32 @@ export default class OrdersList extends Component {
                             <th>Quantity</th>
                             <th>Status</th>
                             <th>Vendor</th>
+                            <th>Edit</th>
                         </tr>
                     </thead>
                     <tbody>
                     { 
                         this.state.orders.map((Order, i) => {
+                            if(Order.status == "Waiting")
                             return (
                                 <tr key={i}>
                                     <td>{Order.product.name}</td>
                                     <td>{Order.quantity} </td>
                                     <td>{Order.status} </td>
                                     <td>{Order.product.vendor.username} </td>
+                                    <td ><Link to={{ pathname: '/edit', state: { 'id': Order._id} }}>Edit</Link></td>
                                 </tr>
+                            )
 
+                            else 
+                            return (
+                                <tr key={i}>
+                                    <td>{Order.product.name}</td>
+                                    <td>{Order.quantity} </td>
+                                    <td>{Order.status} </td>
+                                    <td>{Order.product.vendor.username} </td>
+                                    <td></td>
+                                </tr>
                             )
                         })
                     }

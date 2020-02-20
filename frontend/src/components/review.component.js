@@ -11,7 +11,8 @@ export default class Reviews extends Component {
         this.state = {
             search: '',
             listings: [],
-            id: this.props.location.state.id
+            id: this.props.location.state.id,
+            vendor: this.props.location.state.name,
         }
     }
     
@@ -37,8 +38,11 @@ export default class Reviews extends Component {
     }
 
     render() {
+        let vendor = this.state.vendor;
+        console.log(vendor);
         return (
             <div>
+                <h3>{vendor}'s reviews</h3>
                 <table className="table table-striped">
                     <tbody>
                     { 

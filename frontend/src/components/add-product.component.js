@@ -46,7 +46,11 @@ export default class AddProduct extends Component {
         }    
         console.log(newProduct);
         axios.post('http://localhost:4000/api/products/add', newProduct, {headers: headers})
-            .then(res => console.log(res.data))
+            .then(res => 
+                {
+                    alert("Product successfully added");
+                    console.log(res.data)
+                })
             .catch(function(error) {
                 if(error.response.data.message)
                     alert(error.response.data.message);
@@ -74,7 +78,7 @@ export default class AddProduct extends Component {
                     
                     <div className="form-group">
                         <label>Price: </label>
-                        <input type="number" 
+                        <input type="number" min="1"
                                className="form-control" 
                                value={this.state.price}
                                onChange={this.onChangePrice}
@@ -82,7 +86,7 @@ export default class AddProduct extends Component {
                     </div>
                     <div className="form-group">
                         <label>Quantity: </label>
-                        <input type="number" 
+                        <input type="number" min="1"
                                className="form-control" 
                                value={this.state.quantity}
                                onChange={this.onChangeQuantity}

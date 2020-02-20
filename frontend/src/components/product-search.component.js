@@ -62,7 +62,7 @@ export default class Search extends Component {
                 });
 
         this.setState({
-            search : ''
+            search : '',
         });
     }
 
@@ -78,15 +78,18 @@ export default class Search extends Component {
             'Authorization': token
         }    
         axios.post('http://localhost:4000/api/orders/place',Order, {headers: headers})
-          .then(response => { console.log(response.data)})
+          .then(response => { 
+              alert("Order placed!");
+              console.log(response.data)})
           .catch(err => console.log(err));
     
         this.setState({
-          quantity:''
+          quantity:'',
+          products: [],
     
         })
 
-        window.location.reload();
+        // window.location.reload();
     }
 
 
@@ -198,10 +201,10 @@ export default class Search extends Component {
                                     <td>{Product.name}</td>
                                     <td>{Product.price} </td>
                                     <td>{left}</td>
-                                    <td><Link to={{ pathname: '/vendor', state: { id: Product.vendor._id} }}>{Product.vendor.username} </Link></td>
+                                    <td><Link to={{ pathname: '/vendor', state: { id: Product.vendor._id, name: Product.vendor.username} }}>{Product.vendor.username} </Link></td>
                                     <td>{rating}</td>
                                     {/* <form onSubmit={this.onOrder}> */}
-                                    <td><input type="number" value={this.state.quantity} onChange={this.onChangeQuantity}/> </td>
+                                    <td><input type="number"  min="1" value={this.state.quantity} onChange={this.onChangeQuantity}/> </td>
                                     <td><Button variant="success" onClick={() => {this.placeOrder(Product._id) }}>Buy</Button></td>
                                 </tr>
                             )
