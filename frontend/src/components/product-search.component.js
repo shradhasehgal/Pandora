@@ -19,7 +19,6 @@ export default class Search extends Component {
         this.sortbyRating = this.sortbyRating.bind(this);
         this.sortbyQuantity = this.sortbyQuantity.bind(this);
         this.sortbyPrice = this.sortbyPrice.bind(this);
-        // this.onChangeType = this.onChangeType.bind(this);
         this.onChangeQuantity = this.onChangeQuantity.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.placeOrder = this.placeOrder.bind(this);
@@ -32,7 +31,7 @@ export default class Search extends Component {
     }
 
     onChangeQuantity(event) {
-        this.setState({ quantity: event.target.value });
+        this.setState({ vendor: event.target.value });
     }
 
 
@@ -163,6 +162,7 @@ export default class Search extends Component {
                                onChange={this.onChangeSearch}
                                />  
                     </div>
+
                     <div className="form-group">
                         <input type="submit" value="Search" className="btn btn-primary"/>
                     </div>

@@ -47,7 +47,7 @@ export default class Listings extends Component {
             rating: this.state.quantity
         }
         axios.post('http://localhost:4000/api/vendors/reviews',Review, {headers: headers})
-          .then(response => { console.log(response.data)})
+          .then(response => { alert('Review submitted! Thanks for your time'); console.log(response.data)})
           .catch(function(error) {
             if(error.response.data.message)
             alert(error.response.data.message);
@@ -55,7 +55,8 @@ export default class Listings extends Component {
             });
     
         this.setState({
-          listings: this.state.listings.filter(el => el._id !== id2)
+          listings: this.state.listings.filter(el => el._id !== id2),
+          quantity: 1
         })
     }
 
@@ -86,7 +87,7 @@ export default class Listings extends Component {
                                         <option name="5" value="5">5</option>
                                     </select>
                                     {/* <td><input type="number" value={this.state.quantity} onChange={this.onChangeQuantity}/> </td> */}
-                                    <td><Button variant="primary" onClick={() => {this.rateVendor(order.product.vendor._id, order._id) }}>Rate</Button></td>
+                                    <td><Button onClick={() => {this.rateVendor(order.product.vendor._id, order._id) }}>Rate</Button></td>
                                 </tr>
                             
                             )
