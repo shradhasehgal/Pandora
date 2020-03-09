@@ -1,5 +1,4 @@
 # Pandora - shopping app
-## Assignment 2 - 2018101071
 
 ### To Run
 ```
